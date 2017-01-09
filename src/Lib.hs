@@ -11,7 +11,6 @@ import App
 someFunc :: IO ()
 someFunc = runTheApp
 -- someFunc = runMyApp
--- someFunc = putStrLn "someFunc"
 
 
 runMyApp :: IO ()

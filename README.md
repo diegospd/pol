@@ -14,6 +14,7 @@ Features:
 * Collapsing any node to hide/show its subtree.
 * Reshaping the tree in any way by dragging nodes.
 * Adding new elements at any given depth of the tree.
+* Editing nodes.
 * Deleting a node and its subtree.
 * Saving the tree to disk.
 * Undoing the last transformation to the tree. 
