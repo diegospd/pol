@@ -50,20 +50,3 @@ applyToFirstGen f (Node e ts) = Node e $ map (applyToRoot f) ts
 
 
 
-{- 
-
--- | Convierte un Show en un Text
-pack :: Show a => a -> Text
-pack = T.pack . show
-
-
--- | Igual que echo pero no pone una nueva linea al final
-echo' :: Text -> IO ()
-echo' txt =  T.putStr txt >> IO.hFlush IO.stdout
-
-
-
-toText' :: FilePath -> Text
-toText' = either id id . toText 
-
--}
