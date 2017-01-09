@@ -6,6 +6,7 @@ module Utils
     , applyToRoot
     , applyToAllButRoot
     , applyToFirstGen
+    , replaceZipper
     , module X
     )
 where
@@ -50,3 +51,5 @@ applyToFirstGen f (Node e ts) = Node e $ map (applyToRoot f) ts
 
 
 
+replaceZipper :: Text -> b -> TextZipper Text 
+replaceZipper t  = const $ textZipper [t] (Just 1)

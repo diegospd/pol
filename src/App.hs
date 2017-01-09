@@ -223,8 +223,7 @@ getCurrentLineList :: PState -> Text
 getCurrentLineList st = fromMaybe ""  $ ((^.itsText) . fst . snd) <$> listSelectedElement (st ^. theList)
 
 
-replaceZipper :: Text -> b -> TextZipper Text 
-replaceZipper t  = const $ textZipper [t] (Just 1)
+
 
 -----------------------------------------------------------------
 -----------------------------------------------------------------
