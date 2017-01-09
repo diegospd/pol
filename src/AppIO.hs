@@ -8,7 +8,7 @@ import Utils
 import Data.Aeson
 import Prelude hiding (FilePath)
 import Turtle
-import Data.String.Conversions
+import Data.String.Conversions(cs)
 
 saveFile :: FilePath
 saveFile = ".pol_tree"
@@ -28,12 +28,12 @@ checkOrCreate = do
 writeTree :: Tree Entry -> IO ()
 writeTree t = do
     exists <- checkOrCreate
-    file <- getSaveFile
+    file   <- getSaveFile
     writeTextFile file (cs $ encode t)
 
 readTree :: IO (Maybe (Tree Entry))
 readTree = do
-    file <- getSaveFile
+    file   <- getSaveFile
     exists <- testfile file
     if not exists
         then return Nothing

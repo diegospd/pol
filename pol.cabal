@@ -3,7 +3,7 @@ version:             0.1.0.0
 synopsis:            A simple tree-based notetaker
 description:         Please see README.md
 homepage:            https://github.com/diegospd/pol#readme
-license:             GNU GPLv3
+license:             GPLv3
 license-file:        LICENSE
 author:              Diego Murillo
 maintainer:          diego.spd@gmail.com
