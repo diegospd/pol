@@ -67,7 +67,7 @@ emptyNode :: ETree
 emptyNode = Node (textToEntry "") []
 
 isEmpty :: ETree -> Bool
-isEmpty (Node _ []) = True
+isEmpty (Node _ [])    = True
 isEmpty (Node _ (_:_)) = False
 
 textTreeToETree :: Tree Text -> ETree

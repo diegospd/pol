@@ -64,12 +64,17 @@ lastSave st
 
 myDraw :: PState -> [Widget N]
 myDraw st = do
-    let list = renderList (renderEntry st) True (st^.theList) 
+    let list  = renderList' st 
     let debug = info st
     let saved = padLeft (Pad 3) . padTopBottom 1 $ lastSave st
-    let help = displayHelp (st^.showingHelp)
+    let help  = displayHelp (st^.showingHelp)
     return $ vBox [list, help, saved, debug]
 
+
+renderList' :: PState -> Widget N
+renderList' st 
+    | isEmpty (st^.theTree) = center $ str "  Such an empty tree..." <=> str "Press 'a' to add and entry"
+    | otherwise = renderList (renderEntry st) True (st^.theList) 
 
 renderEntry :: PState -> Bool -> (Entry, Zipper) -> Widget N
 renderEntry _ False (e,_) = padLeft (Pad $ 6 * (e^.itsDepth)) (txt $ e^.itsText)
