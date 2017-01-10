@@ -30,7 +30,7 @@ stack build
 stack exec pol
 ```
 
-Or by adding `~/.cabal/bin` to your `$PATH` and installing it with:
+Or by adding `~/.local/bin` to your `$PATH` and installing it with:
 
 ```sh
 stack install
