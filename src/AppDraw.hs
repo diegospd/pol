@@ -64,18 +64,36 @@ lastSave st
 
 myDraw :: PState -> [Widget N]
 myDraw st = do
-    let list = renderList (renderEntry st) True (st^.theList) 
+    let list  = renderList' st 
     let debug = info st
     let saved = padLeft (Pad 3) . padTopBottom 1 $ lastSave st
-    let help = displayHelp (st^.showingHelp)
+    let help  = displayHelp (st^.showingHelp)
     return $ vBox [list, help, saved, debug]
 
 
+renderList' :: PState -> Widget N
+renderList' st 
+    | isEmpty (st^.theTree) = center $ str "  Such an empty tree..." <=> str "Press 'a' to add and entry"
+    | otherwise = padTop (Pad 2) . padLeft (Pad 2) $ ls
+    where ls = renderList (renderEntry st) True (st^.theList) 
+
 renderEntry :: PState -> Bool -> (Entry, Zipper) -> Widget N
-renderEntry _ False (e,_) = padLeft (Pad $ 6 * (e^.itsDepth)) (txt $ e^.itsText)
+renderEntry _ False (e,_) = padDepth e  (renderEntry' e)
 renderEntry st True (e,_) 
-    | st^.inEditMode = padLeft (Pad $ 6 * (e^.itsDepth)) $ renderEditor True (st ^. theEditor)
-    | otherwise = padLeft (Pad $ 6 * (e^.itsDepth)) (txt $ e^.itsText)
+    | st^.inEditMode = padDepth e $ renderEditor True (st ^. theEditor)
+    | otherwise = padDepth e (renderEntry' e)
+
+padDepth :: Entry -> Widget n -> Widget n
+padDepth e = padLeft (Pad $ 4 * (e^.itsDepth))
+
+renderEntry' :: Entry -> Widget n
+renderEntry' e = case e^.itsDepth of
+    1 -> txt $ "[" <> e^.itsText <> "]"
+    2 -> txt $ "- " <> e^.itsText 
+    3 -> txt $ "· " <> e^.itsText 
+    _ -> txt (e^.itsText)
+
+
 
 ------------------------debug--------------------------------------
 

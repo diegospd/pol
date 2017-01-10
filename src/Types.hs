@@ -67,8 +67,11 @@ emptyNode :: ETree
 emptyNode = Node (textToEntry "") []
 
 isEmpty :: ETree -> Bool
-isEmpty (Node _ []) = True
+isEmpty (Node _ [])    = True
 isEmpty (Node _ (_:_)) = False
+
+isNotEmpty :: ETree -> Bool
+isNotEmpty = not . isEmpty
 
 textTreeToETree :: Tree Text -> ETree
 textTreeToETree = fixTree . fmap textToEntry
