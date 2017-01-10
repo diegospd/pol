@@ -40,7 +40,6 @@ import Data.Either          as X
 applyToRoot :: (a -> a) -> Tree a -> Tree a
 applyToRoot f (Node e ts) = Node (f e) ts 
 
-
 -- | Applies a function to every element of the tree except for the root.
 applyToAllButRoot :: (a -> a) -> Tree a -> Tree a
 applyToAllButRoot f (Node e ts) = Node e $ map (fmap f) ts
@@ -48,7 +47,6 @@ applyToAllButRoot f (Node e ts) = Node e $ map (fmap f) ts
 -- | Applies a function only to the sons of the root node of a Tree.
 applyToFirstGen :: (a -> a) -> Tree a -> Tree a
 applyToFirstGen f (Node e ts) = Node e $ map (applyToRoot f) ts
-
 
 
 replaceZipper :: Text -> b -> TextZipper Text 
