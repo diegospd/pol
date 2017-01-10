@@ -56,7 +56,6 @@ lastSave :: PState -> Widget N
 lastSave st 
     | Just (st^.theTree) == st^.lastSavedTree = str "No changes to save"
     | otherwise = str "Save changes with Ctrl-s"
-    where last = st^.lastSavedTree
 
 
 

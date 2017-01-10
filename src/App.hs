@@ -32,7 +32,7 @@ runTheApp :: IO ()
 runTheApp = do
     fromDisk <- readTree
     let tree = fromMaybe emptyTree fromDisk
-    let st = toState tree & lastSavedTree .~ Just tree
+    let st = toState tree & lastSavedTree ?~ tree
     void $ defaultMain theApp st 
 
 -----------------------------------------------------------------
@@ -67,7 +67,7 @@ handleEv st (VtyEvent (EvKey (KChar 'c') [MCtrl]))  = continue' st $ expandAll s
 handleEv st (VtyEvent (EvKey (KChar 'z') [MCtrl]))  = continue $ rewind st
 handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl]))  = do 
     liftIO (writeChanges st) 
-    let st' = st & lastSavedTree .~ Just (st^.theTree) 
+    let st' = st & lastSavedTree ?~ st^.theTree
     continue st'
 
 handleEv st _ = continue st
