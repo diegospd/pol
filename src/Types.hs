@@ -41,13 +41,13 @@ instance ToJSON Entry
 instance FromJSON Entry
 
 type N = Text
-data PState = St { _theTree  :: ETree
-                 , _theList :: List N (Entry, Zipper)
-                 , _theEditor :: Editor Text N
-                 , _inEditMode :: Bool
-                 , _showingHelp :: Bool
+data PState = St { _theTree       :: ETree
+                 , _theList       :: List N (Entry, Zipper)
+                 , _theEditor     :: Editor Text N
+                 , _inEditMode    :: Bool
+                 , _showingHelp   :: Bool
                  , _lastSavedTree :: Maybe ETree
-                 , _rewinder :: [(Maybe Int, ETree)] 
+                 , _rewinder      :: [(Maybe Int, ETree)] 
                  } deriving Show
 
 
