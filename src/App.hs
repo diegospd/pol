@@ -50,7 +50,7 @@ handleEv st (VtyEvent (EvKey KEnter []))
 handleEv st (VtyEvent (EvKey (KChar 'a') [])) 
     | not (st^.inEditMode) = continue $ addLineHere st & inEditMode .~ True
 handleEv st (VtyEvent (EvKey (KChar 'a') [MCtrl])) 
-    | not (st^.inEditMode) = continue $ addLineBelow st & inEditMode .~ True
+    | not (st^.inEditMode) && isNotEmpty (st^.theTree) = continue $ addLineBelow st & inEditMode .~ True
 handleEv st (VtyEvent e) 
     | st^.inEditMode = continue =<< handleEventLensed st theEditor handleEditorEvent e 
 handleEv st (VtyEvent e) 
