@@ -19,7 +19,7 @@ import qualified Data.Text as T
 
 
 
--- | The main Tree for the state. All maybe values are set to Nothing
+-- | The main Tree for the state. 
 type ETree  = Tree Entry 
 
 
