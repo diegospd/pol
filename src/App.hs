@@ -9,6 +9,7 @@ import AppDraw
 
 import Lens.Micro.Platform
 import Data.Tree.Zipper as Z
+import Data.Tree
 
 import Graphics.Vty
 import qualified Data.Vector as V
@@ -63,6 +64,7 @@ handleEv st (VtyEvent (EvKey KLeft       [MCtrl] )) = continue' st $ dragUpperLe
 handleEv st (VtyEvent (EvKey KRight      [MCtrl] )) = continue' st $ dragLowerLevel st 
 handleEv st (VtyEvent (EvKey (KChar 'h') []      )) = continue $ st & showingHelp %~ not
 handleEv st (VtyEvent (EvKey (KChar 'c') []      )) = continue' st $ collapseAll st
+handleEv st (VtyEvent (EvKey (KChar 'p') []      )) = continue $ moveToParent st
 handleEv st (VtyEvent (EvKey (KChar 'c') [MCtrl]))  = continue' st $ expandAll st
 handleEv st (VtyEvent (EvKey (KChar 'z') [MCtrl]))  = continue $ rewind st
 handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl]))  = do 
@@ -78,6 +80,23 @@ listers :: [Event]
 listers = map (\k -> EvKey k []) [KUp, KDown, KHome, KEnd, KPageDown, KPageUp]
 
 -----------------------------------------------------------------
+
+
+-- | Counts how many visible nodes are between the zipper and its parent.
+-- i.e. it counts how many visible nodes are in the subtrees of its previous siblings
+countNodesBeforeParent :: Zipper -> Int
+countNodesBeforeParent z = sum $ map count $ before z
+    where count = length . filter (^.isVisible) . flatten 
+
+moveToParent :: PState -> PState
+moveToParent = moveAround moveToParent'
+
+moveToParent' :: (Int, Zipper) -> Maybe (Int, Zipper)
+moveToParent' (n, z) 
+    | isRoot z = Nothing
+    | otherwise = return (n', z)
+    where n' = n - 1 - countNodesBeforeParent z
+
 
 continue' :: PState -> PState -> EventM n (Next PState)
 continue' old new 
@@ -179,11 +198,13 @@ dragSideways d = moveAround (dragSideways' d)
 
 dragSideways' :: Direction -> (Int, Zipper) -> Maybe (Int, Zipper)
 dragSideways' d (n, z) = do
-    let (moveT, moveS, n') = case d of 
-            Up   -> (prevTree, prevSpace, n-1)
-            Down -> (nextTree, nextSpace, n+1)
-    z' <- (Z.insert (tree z) . moveS) <$> moveT (Z.delete z) 
-    return (n', z')
+    let (moveT, moveS, f) = case d of 
+            Up   -> (prevTree, prevSpace, (n-))
+            Down -> (nextTree, nextSpace, (n+))
+    t <- moveT (Z.delete z)
+    let n' = length . flatten . tree $ t
+    z' <- (Z.insert (tree z) . moveS) <$> t 
+    return (f n', z')
 
 
 dragUpperLevel :: PState -> PState
@@ -193,7 +214,7 @@ dragUpperLevel' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragUpperLevel' (n, z) = do
     guard =<< not . isRoot <$> parent z
     z' <- (Z.insert (tree z) . prevSpace) <$> parent (Z.delete z)
-    let i = 1 + length (before z)
+    let i = 1 + countNodesBeforeParent z
     return (n-i, z')
  
 
