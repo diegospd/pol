@@ -7,19 +7,10 @@ module Types (
       ETree -- (..)
     , Zipper(..)
     , Entry(..)
-        , itsText
-        , isCollapsed
-        , isVisible
-        , itsDepth
+    , HasEntry(..)
     , N
     , PState(..)
-        , theTree
-        , theList
-        , theEditor
-        , inEditMode
-        , showingHelp
-        , lastSavedTree
-        , rewinder
+    , HasPState(..)
 
     , emptyTree
     , emptyNode
@@ -79,8 +70,8 @@ data PState = St { _theTree       :: ETree
 
 
 
-makeLenses ''Entry
-makeLenses ''PState
+makeClassy ''Entry
+makeClassy ''PState
 
 
 
