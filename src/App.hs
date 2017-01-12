@@ -94,6 +94,7 @@ moveToParent = moveAround moveToParent'
 moveToParent' :: (Int, Zipper) -> Maybe (Int, Zipper)
 moveToParent' (n, z) 
     | isRoot z = Nothing
+    | isFirstLevel z = Nothing
     | otherwise = return (n', z)
     where n' = n - 1 - countNodesBeforeParent z
 
@@ -201,8 +202,8 @@ dragSideways' d (n, z) = do
     let (moveT, moveS, f) = case d of 
             Up   -> (prevTree, prevSpace, (n-))
             Down -> (nextTree, nextSpace, (n+))
-    t <- moveT (Z.delete z)
-    let n' = length . flatten . tree $ t
+    let t = moveT (Z.delete z)
+    n' <- length . flatten . tree <$> t
     z' <- (Z.insert (tree z) . moveS) <$> t 
     return (f n', z')
 

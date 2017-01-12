@@ -73,8 +73,14 @@ isEmpty (Node _ (_:_)) = False
 isNotEmpty :: ETree -> Bool
 isNotEmpty = not . isEmpty
 
+isFirstLevel :: Zipper -> Bool
+isFirstLevel z = case parent z of
+    Nothing -> False
+    Just z' -> isRoot z'
+
 textTreeToETree :: Tree Text -> ETree
 textTreeToETree = fixTree . fmap textToEntry
+
 
 fixTree :: ETree -> ETree
 fixTree = setDepths 0 . setVisibilities . rootIsNeitherCollapsedNorVisible
