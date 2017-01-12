@@ -3,8 +3,35 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 
-module Types where
+module Types (
+      ETree -- (..)
+    , Zipper(..)
+    , Entry(..)
+        , itsText
+        , isCollapsed
+        , isVisible
+        , itsDepth
+    , N
+    , PState(..)
+        , theTree
+        , theList
+        , theEditor
+        , inEditMode
+        , showingHelp
+        , lastSavedTree
+        , rewinder
 
+    , emptyTree
+    , emptyNode
+    , isEmpty
+    , isNotEmpty
+    , isFirstLevelOrRoot
+    , toState
+    , zipperToState
+    , treeToState
+    , textTreeToETree
+    )
+where 
 
 import Utils
 
@@ -57,26 +84,44 @@ makeLenses ''PState
 
 
 
----------------------- splice ---------------------------
+---------------------- th-splice ---------------------------
 
 
 emptyTree :: ETree
 emptyTree = fixTree $ Node (textToEntry "root") []
 
+
 emptyNode :: ETree
 emptyNode = Node (textToEntry "") []
+
+
+-------------------- predicates ------------------------
+
 
 isEmpty :: ETree -> Bool
 isEmpty (Node _ [])    = True
 isEmpty (Node _ (_:_)) = False
 
+
 isNotEmpty :: ETree -> Bool
 isNotEmpty = not . isEmpty
 
-isFirstLevel :: Zipper -> Bool
-isFirstLevel z = case parent z of
-    Nothing -> False
-    Just z' -> isRoot z'
+
+isFirstLevelOrRoot :: Zipper -> Bool
+isFirstLevelOrRoot z = maybe True isRoot (parent z)
+
+
+
+
+
+textToEntry :: Text -> Entry
+textToEntry x = En { _itsText     = x
+                   , _isCollapsed = True
+                   , _isVisible   = False
+                   , _itsDepth    = -1
+                   } 
+
+
 
 textTreeToETree :: Tree Text -> ETree
 textTreeToETree = fixTree . fmap textToEntry
@@ -85,12 +130,6 @@ textTreeToETree = fixTree . fmap textToEntry
 fixTree :: ETree -> ETree
 fixTree = setDepths 0 . setVisibilities . rootIsNeitherCollapsedNorVisible
 
-textToEntry :: Text -> Entry
-textToEntry x = En { _itsText     = x
-                   , _isCollapsed = True
-                   , _isVisible   = False
-                   , _itsDepth    = -1
-                   } 
 
 
 rootIsNeitherCollapsedNorVisible :: ETree -> ETree
@@ -144,6 +183,9 @@ toState t = St { _theTree        = t
 
 
 
+treeToState :: PState -> ETree -> PState
+treeToState old = setPreviousFlags old . toState . fixTree
+
 zipperToState :: PState -> Zipper -> PState
-zipperToState old = setPreviousFlags old . toState . fixTree . toTree
+zipperToState old = treeToState old . toTree
 

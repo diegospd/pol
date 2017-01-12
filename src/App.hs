@@ -93,8 +93,7 @@ moveToParent = moveAround moveToParent'
 
 moveToParent' :: (Int, Zipper) -> Maybe (Int, Zipper)
 moveToParent' (n, z) 
-    | isRoot z = Nothing
-    | isFirstLevel z = Nothing
+    | isFirstLevelOrRoot z = Nothing
     | otherwise = return (n', z)
     where n' = n - 1 - countNodesBeforeParent z
 
@@ -116,7 +115,7 @@ rewind :: PState -> PState
 rewind st 
     | null (st^.rewinder) = st
     | otherwise = let ((mn, prev):rest) = st^.rewinder
-                      st' = setPreviousFlags st . toState . fixTree $ prev
+                      st' = treeToState st prev
                   in st' & rewinder .~ rest & theList . listSelectedL .~ mn
 
 writeChanges :: PState -> IO ()
