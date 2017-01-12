@@ -1,6 +1,7 @@
 # Pol
 
-A simple tree-based notetaker using [brick](https://hackage.haskell.org/package/brick) for the graphical interface.
+A simple tree-based notetaker written in Haskell 
+using [brick](https://hackage.haskell.org/package/brick) for the graphical interface.
 
 
 
