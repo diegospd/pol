@@ -61,8 +61,8 @@ handleEv st (VtyEvent e)
     | e `elem` listers =  continue =<< handleEventLensed st theList handleListEvent e 
 
 handleEv st (VtyEvent (EvKey (KChar 'd') [MCtrl] )) = continue' st $ dropCurrent st
-handleEv st (VtyEvent (EvKey KUp         [MCtrl] )) = continue' st $ dragSideways Up st   
-handleEv st (VtyEvent (EvKey KDown       [MCtrl] )) = continue' st $ dragSideways Down st
+handleEv st (VtyEvent (EvKey KUp         [MCtrl] )) = continue' st $ dragAbove st   
+handleEv st (VtyEvent (EvKey KDown       [MCtrl] )) = continue' st $ dragBelow st
 handleEv st (VtyEvent (EvKey KLeft       [MCtrl] )) = continue' st $ dragUpperLevel st 
 handleEv st (VtyEvent (EvKey KRight      [MCtrl] )) = continue' st $ dragLowerLevel st 
 handleEv st (VtyEvent (EvKey (KChar 'h') []      )) = continue $ st & showingHelp %~ not
@@ -169,6 +169,31 @@ dragSideways' d (n, z) = do
     return (f n', z')
 
 
+dragBelow :: PState -> PState
+dragBelow = moveAround dragBelow'
+
+dragBelow' :: (Int, Zipper) -> Maybe (Int, Zipper)
+dragBelow' (n, z) = do
+    let t  = tree z
+    t' <- nextTree $ Z.delete z
+    let z' =  nextSpace t'
+    let n' = n + countVisible (tree t')
+    return  (n' , Z.insert t z')
+
+
+dragAbove :: PState -> PState
+dragAbove = moveAround dragAbove'
+
+dragAbove' :: (Int, Zipper) -> Maybe (Int, Zipper)
+dragAbove' (n, z) = do
+    let t  = tree z
+    t' <- prevTree $ Z.delete z
+    let z' =  prevSpace t'
+    let n' = n - countVisible (tree t')
+    return  (n' , Z.insert t z')
+
+
+
 dragUpperLevel :: PState -> PState
 dragUpperLevel = moveAround dragUpperLevel'
 
@@ -271,8 +296,11 @@ cancelEdit' (n,z)
 -- | Counts how many visible nodes are between the zipper and its parent.
 -- i.e. it counts how many visible nodes are in the subtrees of its previous siblings
 countNodesBeforeParent :: Zipper -> Int
-countNodesBeforeParent z = sum $ map count $ before z
-    where count = length . filter (^.isVisible) . flatten 
+countNodesBeforeParent z = sum $ map countVisible $ before z
+
+
+countVisible :: ETree -> Int
+countVisible = length . filter (^.isVisible) . flatten 
 
 
 
