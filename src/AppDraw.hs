@@ -13,6 +13,8 @@ import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 
 import Lens.Micro.Platform
+import Data.Tree 
+import Data.Tree.Zipper as Z
 import Graphics.Vty
 
 debug_flag = False
@@ -89,20 +91,26 @@ renderList' st
                      else withBorderStyle unicode . border . withBorderStyle (borderStyleFromChar ' ') . border
 
 renderEntry :: PState -> Bool -> (Entry, Zipper) -> Widget N
-renderEntry _ False (e,_) = padDepth e  (renderEntry' e)
-renderEntry st True (e,_) 
+renderEntry _ False (e,z) = padDepth e  (renderEntry' (e,z))
+renderEntry st True (e,z) 
     | st^.inEditMode = padDepth e $ renderEditor True (st ^. theEditor)
-    | otherwise = padDepth e (renderEntry' e)
+    | otherwise = padDepth e (renderEntry' (e,z))
 
 padDepth :: Entry -> Widget n -> Widget n
 padDepth e = padLeft (Pad $ 4 * (e^.itsDepth))
 
-renderEntry' :: Entry -> Widget n
-renderEntry' e = case e^.itsDepth of
-    1 -> txt $ "[" <> e^.itsText <> "]"
-    2 -> txt $ "- " <> e^.itsText 
-    3 -> txt $ "· " <> e^.itsText 
-    _ -> txt (e^.itsText)
+tagWithNumOfSons :: Zipper -> Widget n
+tagWithNumOfSons z = str $ "  [" <> fstLvl <> "|" <> total <> "]" 
+   where fstLvl = maybe "0" (show . length)  ((!!! 1) . levels . tree $ z) 
+         total = show . subtract 1 . length . flatten . tree $ z
+
+renderEntry' :: (Entry, Zipper) -> Widget n
+renderEntry' (e,z) = text <+> tagWithNumOfSons z
+    where text = case e^.itsDepth of
+            1 -> txt $ "[" <> e^.itsText <> "]"
+            2 -> txt $ "- " <> e^.itsText 
+            3 -> txt $ "· " <> e^.itsText 
+            _ -> txt (e^.itsText)
 
 
 
