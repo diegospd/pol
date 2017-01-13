@@ -27,6 +27,7 @@ helpUI = [ ( "Esc"            , "quit no save"  )
          , ( "a"              , "add a line here")
          , ( "C-a"            , "add a line in next level")
          , ( "e"              , "edit line"     )
+         , ( "p"              , "jump to parent")
          , ( "h"              , "show/hide this")
          ]
          
