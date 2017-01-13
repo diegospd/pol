@@ -82,8 +82,9 @@ renderList' st
     | isEmpty (st^.theTree) = center $ str "  Such an empty tree..." <=> str "Press 'a' to add and entry"
     | otherwise = padAll 2  ls
     where ls = myBorder $ renderList (renderEntry st) True (st^.theList) 
-          myBorder = if hasChanges st then withBorderStyle unicodeBold . border . border
-                                      else withBorderStyle unicode . border . withBorderStyle (borderStyleFromChar ' ') . border
+          myBorder = if hasChanges st 
+                     then withBorderStyle unicodeBold . border . border
+                     else withBorderStyle unicode . border . withBorderStyle (borderStyleFromChar ' ') . border
 
 renderEntry :: PState -> Bool -> (Entry, Zipper) -> Widget N
 renderEntry _ False (e,_) = padDepth e  (renderEntry' e)
