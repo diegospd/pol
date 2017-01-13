@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module AppDraw where
+module AppDraw (myDraw,theAttrMap)
+
+where
 
 import Utils
 import Types
