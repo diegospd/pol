@@ -36,7 +36,10 @@ runTheApp = do
     let st = toState tree & lastSavedTree ?~ tree
     void $ defaultMain theApp st 
 
+
+
 -----------------------------------------------------------------
+--               E v e n t    H a n d l e r 
 -----------------------------------------------------------------
 
 handleEv :: PState -> BrickEvent N () -> EventM N (Next PState)
@@ -79,15 +82,39 @@ handleEv st _ = continue st
 listers :: [Event]
 listers = map (\k -> EvKey k []) [KUp, KDown, KHome, KEnd, KPageDown, KPageUp]
 
+
+
+
+-----------------------------------------------------------------
+--     M o v i n g    a r o u n d   t h e    t r e e
 -----------------------------------------------------------------
 
 
--- | Counts how many visible nodes are between the zipper and its parent.
--- i.e. it counts how many visible nodes are in the subtrees of its previous siblings
-countNodesBeforeParent :: Zipper -> Int
-countNodesBeforeParent z = sum $ map count $ before z
-    where count = length . filter (^.isVisible) . flatten 
+-- | Makes some kind of transformation to the tree. Uses a function
+-- that takes the index of the selected element in the List and
+-- its corresponding Zipper, and Maybe returns the new selected index and 
+-- a zipper for a new Tree. If the function returns Nothing or there is
+-- no selected item in the List the state is not modified. Otherwise
+-- it makes a new state out of the zipper that is returned by the function
+-- and sets the selected element in the List accordingly.
+moveAround :: ((Int, Zipper) -> Maybe (Int, Zipper)) -> PState -> PState
+moveAround f st = fromMaybe st $ do
+    (n, (e,z)) <- listSelectedElement (st^.theList)
+    (n', z') <- f (n, z)
+    return $ zipperToState st z' & theList %~ listMoveTo n'
 
+
+
+
+-----------------------------------------------------------------
+--   The following functions only mess with the selected
+--   element in the list or modifies the visiblity of some nodes.
+--   The tree structure is not altered in any other way.
+-----------------------------------------------------------------
+
+
+-- | Changes the selected item in the list to the parent of the current element.
+-- If the selected element is a top level node nothing is changed.
 moveToParent :: PState -> PState
 moveToParent = moveAround moveToParent'
 
@@ -98,75 +125,13 @@ moveToParent' (n, z)
     where n' = n - 1 - countNodesBeforeParent z
 
 
-continue' :: PState -> PState -> EventM n (Next PState)
-continue' old new 
-    | (old^.theTree) == (new^.theTree) = continue new
-    | otherwise = continue $ new & rewinder .~ (old^.theList.listSelectedL, old^.theTree):(old^.rewinder)
 
-moveAround :: ((Int, Zipper) -> Maybe (Int, Zipper)) -> PState -> PState
-moveAround f st = fromMaybe st $ do
-    (n, (e,z)) <- listSelectedElement (st^.theList)
-    (n', z') <- f (n, z)
-    return $ zipperToState st z' & theList %~ listMoveTo n'
-
-
-
-rewind :: PState -> PState
-rewind st 
-    | null (st^.rewinder) = st
-    | otherwise = let ((mn, prev):rest) = st^.rewinder
-                      st' = treeToState st prev
-                  in st' & rewinder .~ rest & theList . listSelectedL .~ mn
-
-writeChanges :: PState -> IO ()
-writeChanges st = writeTree (st^.theTree)
-
-
-addLineHere :: PState -> PState
-addLineHere st 
-    | isEmpty (st^.theTree) = zipperToState st . snd . fromJust $ addLineBelow' (0, fromTree $ st^.theTree)
-    | otherwise = moveAround addLineHere' st
-
-addLineHere' :: (Int, Zipper) -> Maybe (Int, Zipper)
-addLineHere' (n, z) = return (n, z')
-    where z' = Z.insert emptyNode $ prevSpace z
-
-
-addLineBelow :: PState -> PState
-addLineBelow = moveAround addLineBelow'
-
-addLineBelow' :: (Int, Zipper) -> Maybe (Int, Zipper)
-addLineBelow' (n, z) = do
-    let z' = modifyLabel (& isCollapsed .~ False) z
-    let z'' = Z.insert emptyNode (children z')
-    return (n+1, z'')
-
-flushEditor :: PState -> PState
-flushEditor st = moveAround (flushEditor' st) st
-
-flushEditor' :: PState -> (Int, Zipper) -> Maybe (Int, Zipper)
-flushEditor' st (n, z) 
-    | all T.null [edText, oldText] = (,) n <$> parent (Z.delete z)
-    | T.null edText = return (n, z)
-    | otherwise = return (n, modifyLabel (& itsText .~ edText) z)
-    where edText = T.strip . head . getEditContents $ st^.theEditor
-          oldText = T.strip $ label z ^.itsText 
-
-
-cancelEdit :: PState -> PState
-cancelEdit = moveAround cancelEdit'
-
-
-cancelEdit' :: (Int, Zipper) -> Maybe (Int, Zipper)
-cancelEdit' (n,z) 
-    | T.null oldText = (,) n <$> parent (Z.delete z)
-    | otherwise = return (n, z)
-    where oldText = T.strip $ label z ^.itsText
-
-
+-- | The tree is fully expanded. All nodes become visible.
 expandAll :: PState -> PState
 expandAll = moveAround (collapseAll' False)
 
+
+-- | The tree is fully collapsed. Only the top level nodes remain visible.
 collapseAll :: PState -> PState
 collapseAll st =  moveAround (collapseAll' True) st & theList %~ listMoveTo 0
 
@@ -175,21 +140,18 @@ collapseAll' col (n, z) = return (n, z')
     where z' =  modifyTree  (fmap (& isCollapsed .~ col)) (root z)
 
 
-
-dropCurrent :: PState -> PState
-dropCurrent  = moveAround dropCurrent'
-
-dropCurrent' :: (Int, Zipper) -> Maybe (Int, Zipper)
-dropCurrent' (n, z) = Just (n, fromJust . parent $ Z.delete z)
-
-
-
+-- | Collapses or expands the selected element.
 toggleCollapse :: PState -> PState
 toggleCollapse = moveAround toggleCollapse'
 
 toggleCollapse' :: (Int, Zipper) -> Maybe (Int, Zipper)
 toggleCollapse' (n, z) = Just (n, modifyLabel (& isCollapsed %~ not) z)
 
+
+-----------------------------------------------------------------
+--     The following functions transforms the tree structure 
+--        without adding or removing any extra elements.
+-----------------------------------------------------------------
 
 
 
@@ -230,6 +192,42 @@ dragLowerLevel' (n, z) = do
 
 
 
+-----------------------------------------------------------------
+-- The following functions add or remove nodes from the tree.
+-----------------------------------------------------------------
+
+
+addLineHere :: PState -> PState
+addLineHere st 
+    | isEmpty (st^.theTree) = zipperToState st . snd . fromJust $ addLineBelow' (0, fromTree $ st^.theTree)
+    | otherwise = moveAround addLineHere' st
+
+addLineHere' :: (Int, Zipper) -> Maybe (Int, Zipper)
+addLineHere' (n, z) = return (n, z')
+    where z' = Z.insert emptyNode $ prevSpace z
+
+
+addLineBelow :: PState -> PState
+addLineBelow = moveAround addLineBelow'
+
+addLineBelow' :: (Int, Zipper) -> Maybe (Int, Zipper)
+addLineBelow' (n, z) = do
+    let z' = modifyLabel (& isCollapsed .~ False) z
+    let z'' = Z.insert emptyNode (children z')
+    return (n+1, z'')
+
+
+dropCurrent :: PState -> PState
+dropCurrent  = moveAround dropCurrent'
+
+dropCurrent' :: (Int, Zipper) -> Maybe (Int, Zipper)
+dropCurrent' (n, z) = Just (n, fromJust . parent $ Z.delete z)
+
+
+-----------------------------------------------------------------
+--           Editing the information in a node
+-----------------------------------------------------------------
+
 
 editCurrentLine :: PState -> PState
 editCurrentLine st = st & theEditor  %~ applyEdit replaceOrKeep
@@ -237,6 +235,82 @@ editCurrentLine st = st & theEditor  %~ applyEdit replaceOrKeep
     where line = getCurrentLineList st
           inEdit = not $ T.null line
           replaceOrKeep = if inEdit then replaceZipper line else id
+
+
+-- | If the old and new texts are both empty, then the current node
+-- is deleted. If only the new text is empty, then the old text is
+-- kept. Otherwise the new text replaces the old one.
+flushEditor :: PState -> PState
+flushEditor st = moveAround (flushEditor' st) st
+
+flushEditor' :: PState -> (Int, Zipper) -> Maybe (Int, Zipper)
+flushEditor' st (n, z) 
+    | all T.null [edText, oldText] = (,) n <$> parent (Z.delete z)
+    | T.null edText = return (n, z)
+    | otherwise = return (n, modifyLabel (& itsText .~ edText) z)
+    where edText = T.strip . head . getEditContents $ st^.theEditor
+          oldText = T.strip $ label z ^.itsText 
+
+
+
+-- | Cancels edit when in edit mode. If the previous text text
+-- was empty then the node is deleted. Otherwise the old text
+-- is kept. 
+cancelEdit :: PState -> PState
+cancelEdit = moveAround cancelEdit'
+
+cancelEdit' :: (Int, Zipper) -> Maybe (Int, Zipper)
+cancelEdit' (n,z) 
+    | T.null oldText = (,) n <$> parent (Z.delete z)
+    | otherwise = return (n, z)
+    where oldText = T.strip $ label z ^.itsText
+
+
+
+
+-- | Counts how many visible nodes are between the zipper and its parent.
+-- i.e. it counts how many visible nodes are in the subtrees of its previous siblings
+countNodesBeforeParent :: Zipper -> Int
+countNodesBeforeParent z = sum $ map count $ before z
+    where count = length . filter (^.isVisible) . flatten 
+
+
+
+-- | When the new state is likely to have a different tree than the previous
+-- one, this functions records the old tree in the new state rewinder so that
+-- the previous state may be recovered later.
+continue' :: PState -> PState -> EventM n (Next PState)
+continue' old new 
+    | (old^.theTree) == (new^.theTree) = continue new
+    | otherwise = continue $ new & rewinder .~ (old^.theList.listSelectedL, old^.theTree):(old^.rewinder)
+
+
+
+
+-- | If the rewinder is not empty, then it restores the previous state.
+rewind :: PState -> PState
+rewind st 
+    | null (st^.rewinder) = st
+    | otherwise = let ((mn, prev):rest) = st^.rewinder
+                      st' = treeToState st prev
+                  in st' & rewinder .~ rest & theList . listSelectedL .~ mn
+
+
+-- | Writes the tree to disk
+writeChanges :: PState -> IO ()
+writeChanges st = writeTree (st^.theTree)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
           

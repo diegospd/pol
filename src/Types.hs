@@ -103,8 +103,38 @@ isFirstLevelOrRoot z = maybe True isRoot (parent z)
 
 
 
+---------------------------------------------------------
+
+-- | Makes a PState out of an ETree. Should be useful when
+-- reading an ETree from disk.
+toState :: ETree -> PState
+toState t = St { _theTree        = t
+                , _theList       = toList t
+                , _theEditor     = editorText "theEditor" (txt . T.concat) (Just 1) ""
+                , _inEditMode    = False
+                , _showingHelp   = isEmpty t
+                , _lastSavedTree = Nothing
+                , _rewinder      = []
+                }
 
 
+-- | Makes a new state ouf of an old state and a new ETree. 
+treeToState :: PState -> ETree -> PState
+treeToState old = setPreviousFlags old . toState . fixTree
+
+-- | Maes a new state out of an old state and a Zipper for the
+-- new ETree.
+zipperToState :: PState -> Zipper -> PState
+zipperToState old = treeToState old . toTree
+
+
+
+-- | Carries the flags from the old state to the new one/
+setPreviousFlags :: PState -> PState -> PState
+setPreviousFlags old new = new & showingHelp .~ (old^.showingHelp)
+                               & lastSavedTree .~ (old^.lastSavedTree)
+
+-- | Makes an Entry out of some Text.
 textToEntry :: Text -> Entry
 textToEntry x = En { _itsText     = x
                    , _isCollapsed = True
@@ -118,6 +148,7 @@ textTreeToETree :: Tree Text -> ETree
 textTreeToETree = fixTree . fmap textToEntry
 
 
+-- | Sets visibilites and depths of an ETree
 fixTree :: ETree -> ETree
 fixTree = setDepths 0 . setVisibilities . rootIsNeitherCollapsedNorVisible
 
@@ -126,6 +157,7 @@ fixTree = setDepths 0 . setVisibilities . rootIsNeitherCollapsedNorVisible
 rootIsNeitherCollapsedNorVisible :: ETree -> ETree
 rootIsNeitherCollapsedNorVisible (Node e ts) = Node e' ts
     where e' = e & isCollapsed .~ False & isVisible .~ False
+
 
 setVisibilities :: ETree -> ETree
 setVisibilities t@(Node e ts)
@@ -155,28 +187,4 @@ setZippers z (Node e ts) = Node (e, z) (zipWith setZippers zs ts)
 
 
 ---------------
-
-
-
-setPreviousFlags :: PState -> PState -> PState
-setPreviousFlags old new = new & showingHelp .~ (old^.showingHelp)
-                               & lastSavedTree .~ (old^.lastSavedTree)
-
-toState :: ETree -> PState
-toState t = St { _theTree        = t
-                , _theList       = toList t
-                , _theEditor     = editorText "theEditor" (txt . T.concat) (Just 1) ""
-                , _inEditMode    = False
-                , _showingHelp   = isEmpty t
-                , _lastSavedTree = Nothing
-                , _rewinder      = []
-                }
-
-
-
-treeToState :: PState -> ETree -> PState
-treeToState old = setPreviousFlags old . toState . fixTree
-
-zipperToState :: PState -> Zipper -> PState
-zipperToState old = treeToState old . toTree
 
