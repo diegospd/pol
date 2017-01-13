@@ -7,6 +7,9 @@ import Types
 
 
 import Brick.Widgets.Core
+import Brick.Widgets.Border
+import Brick.Widgets.Border.Style
+
 import Lens.Micro.Platform
 import Graphics.Vty
 
@@ -53,10 +56,13 @@ joinH xs = vBox as <+> vBox bs
           bs = map (\x -> txt $ " - " <> snd x) xs
 
 -----------------------last save------------------------------
+hasChanges :: PState -> Bool
+hasChanges st  = Just (st^.theTree) /= st^.lastSavedTree
+
 lastSave :: PState -> Widget N
 lastSave st 
-    | Just (st^.theTree) == st^.lastSavedTree = str "No changes to save"
-    | otherwise = str "Save changes with Ctrl-s"
+    | hasChanges st =  str "Save changes with Ctrl-s"
+    | otherwise = str "No changes to save"
 
 
 
@@ -74,9 +80,10 @@ myDraw st = do
 renderList' :: PState -> Widget N
 renderList' st 
     | isEmpty (st^.theTree) = center $ str "  Such an empty tree..." <=> str "Press 'a' to add and entry"
-    | otherwise = padTop (Pad 2) . padLeft (Pad 2) $ ls
-    where ls = renderList (renderEntry st) True (st^.theList) 
-
+    | otherwise = padAll 2  ls
+    where ls = myBorder $ renderList (renderEntry st) True (st^.theList) 
+          myBorder = if hasChanges st then withBorderStyle unicodeBold . border . border
+                                      else withBorderStyle unicode . border . withBorderStyle (borderStyleFromChar ' ') . border
 
 renderEntry :: PState -> Bool -> (Entry, Zipper) -> Widget N
 renderEntry _ False (e,_) = padDepth e  (renderEntry' e)
