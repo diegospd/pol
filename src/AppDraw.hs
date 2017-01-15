@@ -91,7 +91,7 @@ myDraw st = do
 
 drawDepth :: (Entry, Zipper) -> Widget n
 drawDepth (e, z)
-    | isLast z && (e^.itsDepth) > 1 = hBox $ (replicate (e^.itsDepth - 2) step) ++ [last]
+    | isLast z && (e^.itsDepth) > 1 = hBox $ replicate (e ^. itsDepth - 2) step ++ [last]
     | otherwise = hBox $  replicate (e^.itsDepth - 1) step 
        where step  = str "  │  "
              last  = str "  └──"
