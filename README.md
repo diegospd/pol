@@ -19,7 +19,7 @@ Features:
 * Deleting a node and its subtree.
 * Saving the tree to disk.
 * Undoing the last transformation to the tree. 
-* The list of controls can be displayed by pressing `h`.
+* The complete list of controls can be displayed by pressing `h`.
 
 
 ## Build and run
