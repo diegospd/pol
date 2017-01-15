@@ -7,6 +7,7 @@ module Utils
     , applyToAllButRoot
     , applyToFirstGen
     , replaceZipper
+    , (!!!)
     , module X
     )
 where
@@ -34,6 +35,10 @@ import Data.Default         as X
 import Data.Char            as X
 import Data.Either          as X
 
+(!!!) :: [a] -> Int -> Maybe a
+(!!!) xs n
+    | length xs <= n = Nothing
+    | otherwise = Just $ xs !! n
 
 
 -- | Applies a function only to the root of a Tree.

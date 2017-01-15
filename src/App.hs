@@ -300,7 +300,8 @@ countNodesBeforeParent z = sum $ map countVisible $ before z
 
 
 countVisible :: ETree -> Int
-countVisible = length . filter (^.isVisible) . flatten 
+countVisible = length . filter (^.isVisible) . flatten
+ 
 
 
 
