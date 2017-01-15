@@ -65,6 +65,7 @@ data PState = St { _theTree       :: ETree
                  , _inEditMode    :: Bool
                  , _showingHelp   :: Bool
                  , _lastSavedTree :: Maybe ETree
+                 , _minorChanges  :: Bool -- True iff current tree is the same than last save tree except for collapsed nodes
                  , _rewinder      :: [(Maybe Int, ETree)] 
                  } deriving Show
 
@@ -72,6 +73,7 @@ data PState = St { _theTree       :: ETree
 
 makeClassy ''Entry
 makeClassy ''PState
+
 
 
 
@@ -117,6 +119,7 @@ toState t = St { _theTree        = t
                 , _inEditMode    = False
                 , _showingHelp   = isEmpty t
                 , _lastSavedTree = Nothing
+                , _minorChanges  = True
                 , _rewinder      = []
                 }
 
@@ -125,17 +128,28 @@ toState t = St { _theTree        = t
 treeToState :: PState -> ETree -> PState
 treeToState old = setPreviousFlags old . toState . fixTree
 
--- | Maes a new state out of an old state and a Zipper for the
+-- | Makes a new state out of an old state and a Zipper for the
 -- new ETree.
 zipperToState :: PState -> Zipper -> PState
 zipperToState old = treeToState old . toTree
 
 
+-- | Says if two trees are equal based only on their structure and their texts.
+eqByText :: ETree -> ETree -> Bool
+eqByText t1 t2 = (f <$> t1) == (f <$> t2)
+    where f = (^.itsText)
+
+
+withMinorChanges :: PState -> PState -> Bool
+withMinorChanges old new = case old^.lastSavedTree of
+    Nothing -> False
+    Just t1 -> eqByText t1 (new^.theTree)
 
 -- | Carries the flags from the old state to the new one/
 setPreviousFlags :: PState -> PState -> PState
 setPreviousFlags old new = new & showingHelp .~ (old^.showingHelp)
                                & lastSavedTree .~ (old^.lastSavedTree)
+                               & minorChanges .~ withMinorChanges old new
 
 -- | Makes an Entry out of some Text.
 textToEntry :: Text -> Entry

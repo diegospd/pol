@@ -64,6 +64,7 @@ joinH xs = vBox as <+> vBox bs
 hasChanges :: PState -> Bool
 hasChanges st  = Just (st^.theTree) /= st^.lastSavedTree
 
+
 lastSave :: PState -> Widget N
 lastSave st 
     | hasChanges st =  str "Save changes with Ctrl-s"
@@ -115,11 +116,22 @@ drawList :: PState -> Widget N
 drawList st 
     | isEmpty (st^.theTree) = center $ str "  Such an empty tree..." <=> str "Press 'a' to add and entry"
     | otherwise = padAll 2  ls
-    where ls = myBorder $ renderList (renderEntry st) True (st^.theList) 
-          myBorder = if hasChanges st 
-                     then withBorderStyle unicodeBold . border . border
-                     else withBorderStyle unicode . border . withBorderStyle (borderStyleFromChar ' ') . border
+    where ls = drawBorder st $ renderList (renderEntry st) True (st^.theList) 
+          -- myBorder = if hasChanges st 
+          --            then withBorderStyle unicodeBold . border . border
+          --            else withBorderStyle unicode . border . withBorderStyle (borderStyleFromChar ' ') . border
 
+
+
+drawBorder :: PState -> Widget n -> Widget n
+drawBorder st = withBorderStyle b1 . border . withBorderStyle b2 . border
+    where (b1,b2) = drawBorder' st
+
+drawBorder' :: PState -> (BorderStyle, BorderStyle)
+drawBorder' st 
+    | hasChanges st && st^.minorChanges = (unicodeBold, borderStyleFromChar ' ')
+    | hasChanges st = (unicodeBold, unicodeBold)
+    | otherwise = (unicode, borderStyleFromChar ' ')
 
 
 drawDecoration :: (Entry, Zipper) -> Widget n 
@@ -155,6 +167,7 @@ info' st = case listSelectedElement (st^.theList) of
     Nothing -> emptyWidget
     Just(n,e) -> str (debug_entry e) <=> str ("Edit: " <> show (st ^. inEditMode)) 
     <=> str ("History:" <> show (length $ st^.rewinder))
+    <=> str ("Minor changes: " <> show (st^.minorChanges))
 
 debug_entry :: (Entry,Zipper) -> String
 debug_entry (e,_) = "Collapsed:" ++ show (e^.isCollapsed) ++ "   " ++
