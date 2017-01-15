@@ -117,9 +117,6 @@ drawList st
     | isEmpty (st^.theTree) = center $ str "  Such an empty tree..." <=> str "Press 'a' to add and entry"
     | otherwise = padAll 2  ls
     where ls = drawBorder st $ renderList (renderEntry st) True (st^.theList) 
-          -- myBorder = if hasChanges st 
-          --            then withBorderStyle unicodeBold . border . border
-          --            else withBorderStyle unicode . border . withBorderStyle (borderStyleFromChar ' ') . border
 
 
 
