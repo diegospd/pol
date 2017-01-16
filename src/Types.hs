@@ -6,6 +6,9 @@
 module Types (
       ETree -- (..)
     , Zipper(..)
+    , TreePos(..)
+    , Empty(..)
+    , Full(..)
     , Entry(..)
     , HasEntry(..)
     , N
@@ -32,7 +35,7 @@ import Lens.Micro.Platform
 import qualified Data.Vector as V
 import Data.Tree
 import Data.Tree.Zipper
-import Data.Aeson
+import Data.Aeson(FromJSON, ToJSON)
 import qualified Data.Text as T
 
 

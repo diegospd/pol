@@ -2,7 +2,7 @@ module Utils
     ( Text(..)
     , Vector(..)
     , Tree(..)
-    , TreePos(..)
+    -- , TreePos(..)
     , applyToRoot
     , applyToAllButRoot
     , applyToFirstGen
