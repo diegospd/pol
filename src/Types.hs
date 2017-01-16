@@ -68,7 +68,7 @@ data PState = St { _theTree       :: ETree
                  , _inEditMode    :: Bool
                  , _showingHelp   :: Bool
                  , _lastSavedTree :: Maybe ETree
-                 , _minorChanges  :: Bool -- True iff current tree is the same than last save tree except for collapsed nodes
+                 , _minorChanges  :: Bool -- True iff current tree is the same than last saved tree except for collapsed nodes
                  , _rewinder      :: [(Maybe Int, ETree)] 
                  } deriving Show
 
