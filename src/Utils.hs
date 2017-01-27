@@ -6,6 +6,7 @@ module Utils
     , applyToRoot
     , applyToAllButRoot
     , applyToFirstGen
+    , applyToForest
     , replaceZipper
     , (!!!)
     , module X
@@ -52,6 +53,11 @@ applyToAllButRoot f (Node e ts) = Node e $ map (fmap f) ts
 -- | Applies a function only to the sons of the root node of a Tree.
 applyToFirstGen :: (a -> a) -> Tree a -> Tree a
 applyToFirstGen f (Node e ts) = Node e $ map (applyToRoot f) ts
+
+
+
+applyToForest :: ([Tree a] -> [Tree a]) -> Tree a -> Tree a
+applyToForest f (Node e ts) = Node e (f ts)
 
 
 replaceZipper :: Text -> b -> TextZipper Text 

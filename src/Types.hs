@@ -150,9 +150,9 @@ withMinorChanges old new = case old^.lastSavedTree of
 
 -- | Carries the flags from the old state to the new one/
 setPreviousFlags :: PState -> PState -> PState
-setPreviousFlags old new = new & showingHelp .~ (old^.showingHelp)
+setPreviousFlags old new = new & showingHelp   .~ (old^.showingHelp)
                                & lastSavedTree .~ (old^.lastSavedTree)
-                               & minorChanges .~ withMinorChanges old new
+                               & minorChanges  .~ withMinorChanges old new
 
 -- | Makes an Entry out of some Text.
 textToEntry :: Text -> Entry

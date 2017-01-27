@@ -68,9 +68,10 @@ handleEv st (VtyEvent (EvKey KRight      [MCtrl] )) = continue' st $ dragLowerLe
 handleEv st (VtyEvent (EvKey (KChar 'h') []      )) = continue $ st & showingHelp %~ not
 handleEv st (VtyEvent (EvKey (KChar 'c') []      )) = continue' st $ collapseAll st
 handleEv st (VtyEvent (EvKey (KChar 'p') []      )) = continue $ moveToParent st
-handleEv st (VtyEvent (EvKey (KChar 'c') [MCtrl]))  = continue' st $ expandAll st
-handleEv st (VtyEvent (EvKey (KChar 'z') [MCtrl]))  = continue $ rewind st
-handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl]))  = do 
+handleEv st (VtyEvent (EvKey (KChar 'c') [MCtrl] )) = continue' st $ expandAll st
+handleEv st (VtyEvent (EvKey (KChar 's') []      )) = continue' st $ sortEntries st
+handleEv st (VtyEvent (EvKey (KChar 'z') [MCtrl] )) = continue $ rewind st
+handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do 
     liftIO (writeChanges st) 
     let st' = st & lastSavedTree ?~ st^.theTree
     continue st'
@@ -153,6 +154,15 @@ toggleCollapse' (n, z) = Just (n, modifyLabel (& isCollapsed %~ not) z)
 --        without adding or removing any extra elements.
 -----------------------------------------------------------------
 
+-- | Sorts the current level alphabetically
+sortEntries :: PState -> PState
+sortEntries = moveAround sortEntries'
+
+sortEntries' :: (Int, Zipper) -> Maybe (Int, Zipper)
+sortEntries' (n, z) = return (n, z')
+  where on t = rootLabel t ^. itsText
+        z' = modifyTree (applyToForest $ sortOn on) z
+        -- z'   = fromTree $ applyToForest (sortOn on) (tree z)
 
 
 dragSideways :: Direction -> PState -> PState
