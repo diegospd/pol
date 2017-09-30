@@ -24,15 +24,18 @@ Features:
 
 ## Build and run
 
-Use stack to build and run the project:
-
+Use stack to build the project:
 ```sh
-stack build
-stack exec pol
+$ stack setup
+$ stack build
+```
+
+You can run pol with stack by running:
+```sh
+$ stack exec pol
 ```
 
 Or by adding `~/.local/bin` to your `$PATH` and installing it with:
-
 ```sh
 stack install
 pol
