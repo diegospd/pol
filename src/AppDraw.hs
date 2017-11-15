@@ -17,7 +17,7 @@ import Lens.Micro.Platform
 import Data.Tree
 import Data.Tree.Zipper as Z
 import Graphics.Vty
-
+import qualified Data.Text as T
 debug_flag = False
 
 
@@ -133,7 +133,7 @@ drawDecoration (e,z) =  drawDepth (e,z) <+>  drawBullet (e,z)
 renderEntry :: PState -> Bool -> (Entry, Zipper) -> Widget N
 renderEntry _ False (e,z) = drawDecoration (e,z)  <+> drawText e
 renderEntry st True (e,z)
-    | st^.inEditMode = drawDecoration (e,z) <+> renderEditor True (st ^. theEditor)
+    | st^.inEditMode = drawDecoration (e,z) <+> renderEditor (txt . T.concat) True (st ^. theEditor)
     | otherwise = drawDecoration (e,z) <+> drawText e
 
 

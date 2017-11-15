@@ -118,7 +118,7 @@ isFirstLevelOrRoot z = maybe True isRoot (parent z)
 toState :: ETree -> PState
 toState t = St { _theTree        = t
                 , _theList       = toList t
-                , _theEditor     = editorText "theEditor" (txt . T.concat) (Just 1) ""
+                , _theEditor     = editorText "theEditor" (Just 1) ""
                 , _inEditMode    = False
                 , _showingHelp   = isEmpty t
                 , _lastSavedTree = Nothing

@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-7.14
+resolver: lts-9.13
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -40,9 +40,9 @@ packages:
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps: 
-- brick-0.16
-- text-zipper-0.9
-- vty-5.14
+- brick-0.26
+- rosezipper-0.2
+- word-wrap-0.4.1
 # Override default flag values for local packages and extra-deps
 flags: {}
 
@@ -66,3 +66,4 @@ extra-package-dbs: []
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
