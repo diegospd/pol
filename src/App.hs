@@ -19,8 +19,6 @@ import Control.Monad.IO.Class(liftIO)
 
 
 
-
-
 theApp :: App PState () N
 theApp  = App { appDraw = myDraw
               , appChooseCursor = showFirstCursor
@@ -34,16 +32,16 @@ runTheApp = do
     fromDisk <- readTree
     let tree = fromMaybe emptyTree fromDisk
     let st = toState tree & lastSavedTree ?~ tree
-    void $ defaultMain theApp st 
+    void $ defaultMain theApp st
 
 
 
 -----------------------------------------------------------------
---               E v e n t    H a n d l e r 
+--               E v e n t    H a n d l e r
 -----------------------------------------------------------------
 
 handleEv :: PState -> BrickEvent N () -> EventM N (Next PState)
-handleEv st (VtyEvent (EvKey (KChar 'e') [])) 
+handleEv st (VtyEvent (EvKey (KChar 'e') []))
     | not (st^.inEditMode) = continue' st $ editCurrentLine st
 handleEv st (VtyEvent (EvKey KEsc []))
     | st^.inEditMode = continue $ cancelEdit st & inEditMode .~ False
@@ -51,28 +49,28 @@ handleEv st (VtyEvent (EvKey KEsc []))
 handleEv st (VtyEvent (EvKey KEnter []))
     | st^.inEditMode = continue' st $ flushEditor st
     | otherwise      = continue' st $ toggleCollapse st
-handleEv st (VtyEvent (EvKey (KChar 'a') [])) 
+handleEv st (VtyEvent (EvKey (KChar 'a') []))
     | not (st^.inEditMode) = continue $ addLineHere st & inEditMode .~ True
-handleEv st (VtyEvent (EvKey (KChar 'a') [MCtrl])) 
+handleEv st (VtyEvent (EvKey (KChar 'a') [MCtrl]))
     | not (st^.inEditMode) && isNotEmpty (st^.theTree) = continue $ addLineBelow st & inEditMode .~ True
-handleEv st (VtyEvent e) 
-    | st^.inEditMode = continue =<< handleEventLensed st theEditor handleEditorEvent e 
-handleEv st (VtyEvent e) 
-    | e `elem` listers =  continue =<< handleEventLensed st theList handleListEvent e 
+handleEv st (VtyEvent e)
+    | st^.inEditMode = continue =<< handleEventLensed st theEditor handleEditorEvent e
+handleEv st (VtyEvent e)
+    | e `elem` listers =  continue =<< handleEventLensed st theList handleListEvent e
 
 handleEv st (VtyEvent (EvKey (KChar 'd') [MCtrl] )) = continue' st $ dropCurrent st
-handleEv st (VtyEvent (EvKey KUp         [MCtrl] )) = continue' st $ dragAbove st   
+handleEv st (VtyEvent (EvKey KUp         [MCtrl] )) = continue' st $ dragAbove st
 handleEv st (VtyEvent (EvKey KDown       [MCtrl] )) = continue' st $ dragBelow st
-handleEv st (VtyEvent (EvKey KLeft       [MCtrl] )) = continue' st $ dragUpperLevel st 
-handleEv st (VtyEvent (EvKey KRight      [MCtrl] )) = continue' st $ dragLowerLevel st 
+handleEv st (VtyEvent (EvKey KLeft       [MCtrl] )) = continue' st $ dragUpperLevel st
+handleEv st (VtyEvent (EvKey KRight      [MCtrl] )) = continue' st $ dragLowerLevel st
 handleEv st (VtyEvent (EvKey (KChar 'h') []      )) = continue $ st & showingHelp %~ not
 handleEv st (VtyEvent (EvKey (KChar 'c') []      )) = continue' st $ collapseAll st
 handleEv st (VtyEvent (EvKey (KChar 'p') []      )) = continue $ moveToParent st
 handleEv st (VtyEvent (EvKey (KChar 'c') [MCtrl] )) = continue' st $ expandAll st
 handleEv st (VtyEvent (EvKey (KChar 's') []      )) = continue' st $ sortEntries st
 handleEv st (VtyEvent (EvKey (KChar 'z') [MCtrl] )) = continue $ rewind st
-handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do 
-    liftIO (writeChanges st) 
+handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do
+    liftIO (writeChanges st)
     let st' = st & lastSavedTree ?~ st^.theTree
     continue st'
 
@@ -93,7 +91,7 @@ listers = map (\k -> EvKey k []) [KUp, KDown, KHome, KEnd, KPageDown, KPageUp]
 
 -- | Makes some kind of transformation to the tree. Uses a function
 -- that takes the index of the selected element in the List and
--- its corresponding Zipper, and Maybe returns the new selected index and 
+-- its corresponding Zipper, and Maybe returns the new selected index and
 -- a zipper for a new Tree. If the function returns Nothing or there is
 -- no selected item in the List the state is not modified. Otherwise
 -- it makes a new state out of the zipper that is returned by the function
@@ -120,7 +118,7 @@ moveToParent :: PState -> PState
 moveToParent = moveAround moveToParent'
 
 moveToParent' :: (Int, Zipper) -> Maybe (Int, Zipper)
-moveToParent' (n, z) 
+moveToParent' (n, z)
     | isFirstLevelOrRoot z = Nothing
     | otherwise = return (n', z)
     where n' = n - 1 - countNodesBeforeParent z
@@ -150,7 +148,7 @@ toggleCollapse' (n, z) = Just (n, modifyLabel (& isCollapsed %~ not) z)
 
 
 -----------------------------------------------------------------
---     The following functions transforms the tree structure 
+--     The following functions transforms the tree structure
 --        without adding or removing any extra elements.
 -----------------------------------------------------------------
 
@@ -170,12 +168,12 @@ dragSideways d = moveAround (dragSideways' d)
 
 dragSideways' :: Direction -> (Int, Zipper) -> Maybe (Int, Zipper)
 dragSideways' d (n, z) = do
-    let (moveT, moveS, f) = case d of 
+    let (moveT, moveS, f) = case d of
             Up   -> (prevTree, prevSpace, (n-))
             Down -> (nextTree, nextSpace, (n+))
     let t = moveT (Z.delete z)
     n' <- length . flatten . tree <$> t
-    z' <- (Z.insert (tree z) . moveS) <$> t 
+    z' <- (Z.insert (tree z) . moveS) <$> t
     return (f n', z')
 
 
@@ -194,6 +192,7 @@ dragBelow' (n, z) = do
 dragAbove :: PState -> PState
 dragAbove = moveAround dragAbove'
 
+
 dragAbove' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragAbove' (n, z) = do
     let t  = tree z
@@ -203,9 +202,9 @@ dragAbove' (n, z) = do
     return  (n' , Z.insert t z')
 
 
-
 dragUpperLevel :: PState -> PState
 dragUpperLevel = moveAround dragUpperLevel'
+
 
 dragUpperLevel' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragUpperLevel' (n, z) = do
@@ -213,18 +212,16 @@ dragUpperLevel' (n, z) = do
     z' <- (Z.insert (tree z) . prevSpace) <$> parent (Z.delete z)
     let i = 1 + countNodesBeforeParent z
     return (n-i, z')
- 
-
 
 
 dragLowerLevel :: PState -> PState
 dragLowerLevel = moveAround dragLowerLevel'
 
+
 dragLowerLevel' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragLowerLevel' (n, z) = do
-    z' <- parent =<< (Z.insert (tree z) . children <$> nextTree (Z.delete z)) 
+    z' <- parent =<< (Z.insert (tree z) . children <$> nextTree (Z.delete z))
     return (n+1, modifyLabel (& isCollapsed .~ False) z')
-
 
 
 -----------------------------------------------------------------
@@ -262,8 +259,6 @@ dropCurrent' (n, z) = Just (n, fromJust . parent $ Z.delete z)
 -----------------------------------------------------------------
 --           Editing the information in a node
 -----------------------------------------------------------------
-
-
 editCurrentLine :: PState -> PState
 editCurrentLine st = st & theEditor  %~ applyEdit replaceOrKeep
                         & inEditMode .~ inEdit
@@ -279,28 +274,26 @@ flushEditor :: PState -> PState
 flushEditor st = moveAround (flushEditor' st) st
 
 flushEditor' :: PState -> (Int, Zipper) -> Maybe (Int, Zipper)
-flushEditor' st (n, z) 
+flushEditor' st (n, z)
     | all T.null [edText, oldText] = (,) n <$> parent (Z.delete z)
     | T.null edText = return (n, z)
     | otherwise = return (n, modifyLabel (& itsText .~ edText) z)
     where edText = T.strip . head . getEditContents $ st^.theEditor
-          oldText = T.strip $ label z ^.itsText 
-
+          oldText = T.strip $ label z ^.itsText
 
 
 -- | Cancels edit when in edit mode. If the previous text text
 -- was empty then the node is deleted. Otherwise the old text
--- is kept. 
+-- is kept.
 cancelEdit :: PState -> PState
 cancelEdit = moveAround cancelEdit'
 
+
 cancelEdit' :: (Int, Zipper) -> Maybe (Int, Zipper)
-cancelEdit' (n,z) 
+cancelEdit' (n,z)
     | T.null oldText = (,) n <$> parent (Z.delete z)
     | otherwise = return (n, z)
     where oldText = T.strip $ label z ^.itsText
-
-
 
 
 -- | Counts how many visible nodes are between the zipper and its parent.
@@ -311,24 +304,20 @@ countNodesBeforeParent z = sum $ map countVisible $ before z
 
 countVisible :: ETree -> Int
 countVisible = length . filter (^.isVisible) . flatten
- 
-
 
 
 -- | When the new state is likely to have a different tree than the previous
 -- one, this functions records the old tree in the new state rewinder so that
 -- the previous state may be recovered later.
 continue' :: PState -> PState -> EventM n (Next PState)
-continue' old new 
+continue' old new
     | (old^.theTree) == (new^.theTree) = continue new
     | otherwise = continue $ new & rewinder .~ (old^.theList.listSelectedL, old^.theTree):(old^.rewinder)
 
 
-
-
 -- | If the rewinder is not empty, then it restores the previous state.
 rewind :: PState -> PState
-rewind st 
+rewind st
     | null (st^.rewinder) = st
     | otherwise = let ((mn, prev):rest) = st^.rewinder
                       st' = treeToState st prev
@@ -340,35 +329,5 @@ writeChanges :: PState -> IO ()
 writeChanges st = writeTree (st^.theTree)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-          
 getCurrentLineList :: PState -> Text
 getCurrentLineList st = fromMaybe ""  $ ((^.itsText) . fst . snd) <$> listSelectedElement (st ^. theList)
-
-
-
-
------------------------------------------------------------------
------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
