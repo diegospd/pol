@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DeriveGeneric #-}
-
-
 module Types (
       ETree -- (..)
     , Zipper(..)
@@ -25,12 +23,10 @@ module Types (
     , treeToState
     , textTreeToETree
     )
-where 
+where
 
 import Utils
-
 import GHC.Generics
-
 import Lens.Micro.Platform
 import qualified Data.Vector as V
 import Data.Tree
@@ -38,19 +34,14 @@ import Data.Tree.Zipper
 import Data.Aeson(FromJSON, ToJSON)
 import qualified Data.Text as T
 
-
-
 -- | The main Tree for the state. 
 type ETree  = Tree Entry 
-
 
 -- | Intermediate Tree for building a List.
 type ETreeL = Tree (Entry, Zipper)
 
 -- | A zipper for an ETree
 type Zipper = TreePos Full Entry
-
-
 
 data Entry = En { _itsText     :: Text
                 , _isCollapsed :: Bool
@@ -72,20 +63,14 @@ data PState = St { _theTree       :: ETree
                  , _rewinder      :: [(Maybe Int, ETree)] 
                  } deriving Show
 
-
-
 makeClassy ''Entry
 makeClassy ''PState
 
 
-
-
 ---------------------- th-splice ---------------------------
-
 
 emptyTree :: ETree
 emptyTree = fixTree $ Node (textToEntry "root") []
-
 
 emptyNode :: ETree
 emptyNode = Node (textToEntry "") []
@@ -93,22 +78,15 @@ emptyNode = Node (textToEntry "") []
 
 -------------------- predicates ------------------------
 
-
 isEmpty :: ETree -> Bool
 isEmpty (Node _ [])    = True
 isEmpty (Node _ (_:_)) = False
 
-
 isNotEmpty :: ETree -> Bool
 isNotEmpty = not . isEmpty
 
-
 isFirstLevelOrRoot :: Zipper -> Bool
 isFirstLevelOrRoot z = maybe True isRoot (parent z)
-
-
-
-
 
 
 ---------------------------------------------------------
@@ -126,7 +104,6 @@ toState t = St { _theTree        = t
                 , _rewinder      = []
                 }
 
-
 -- | Makes a new state ouf of an old state and a new ETree. 
 treeToState :: PState -> ETree -> PState
 treeToState old = setPreviousFlags old . toState . fixTree
@@ -136,12 +113,10 @@ treeToState old = setPreviousFlags old . toState . fixTree
 zipperToState :: PState -> Zipper -> PState
 zipperToState old = treeToState old . toTree
 
-
 -- | Says if two trees are equal based only on their structure and their texts.
 eqByText :: ETree -> ETree -> Bool
 eqByText t1 t2 = (f <$> t1) == (f <$> t2)
     where f = (^.itsText)
-
 
 withMinorChanges :: PState -> PState -> Bool
 withMinorChanges old new = case old^.lastSavedTree of
@@ -162,49 +137,36 @@ textToEntry x = En { _itsText     = x
                    , _itsDepth    = -1
                    } 
 
-
-
 textTreeToETree :: Tree Text -> ETree
 textTreeToETree = fixTree . fmap textToEntry
-
 
 -- | Sets visibilites and depths of an ETree
 fixTree :: ETree -> ETree
 fixTree = setDepths 0 . setVisibilities . rootIsNeitherCollapsedNorVisible
 
-
-
 rootIsNeitherCollapsedNorVisible :: ETree -> ETree
 rootIsNeitherCollapsedNorVisible (Node e ts) = Node e' ts
     where e' = e & isCollapsed .~ False & isVisible .~ False
-
 
 setVisibilities :: ETree -> ETree
 setVisibilities t@(Node e ts)
     | e^.isCollapsed = applyToAllButRoot (& isVisible .~ False) t
     | otherwise = Node e $ map (setVisibilities . applyToRoot (& isVisible .~ True)) ts
 
-
 setDepths :: Int -> ETree -> ETree
 setDepths n (Node e ts) = Node (e & itsDepth .~ n) $ map (setDepths (n+1)) ts
 
 
 ----------
+
 toList :: ETree -> List N (Entry, Zipper)
 toList t = list "theList" es 1
     where es = V.fromList $ filter ((^.isVisible) . fst) $ flatten $ toETreeL t
     -- where es = V.fromList $ {-filter (^.isVisible) $-} flatten $ toETreeL t
 
-
 toETreeL :: ETree -> Tree (Entry, Zipper)
 toETreeL t = setZippers (fromTree t) t  
-
 
 setZippers :: Zipper -> ETree -> Tree (Entry, Zipper)
 setZippers z (Node e ts) = Node (e, z) (zipWith setZippers zs ts)
     where zs = [fromJust $ childAt (n-1) z | n <- [1 .. length ts] ]
-
-
-
----------------
-

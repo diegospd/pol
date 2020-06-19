@@ -6,34 +6,29 @@ import Utils
 import Types
 import AppIO
 import AppDraw
-
 import Lens.Micro.Platform
 import Data.Tree.Zipper as Z
 import Data.Tree
-
 import Graphics.Vty
 import qualified Data.Vector as V
 import qualified Data.Text as T
-
 import Control.Monad.IO.Class(liftIO)
 
 
-
 theApp :: App PState () N
-theApp  = App { appDraw = myDraw
+theApp  = App { appDraw         = myDraw
               , appChooseCursor = showFirstCursor
-              , appHandleEvent = handleEv
-              , appStartEvent = return
-              , appAttrMap = theAttrMap
+              , appHandleEvent  = handleEv
+              , appStartEvent   = return
+              , appAttrMap      = theAttrMap
               }
 
 runTheApp :: IO ()
 runTheApp = do
     fromDisk <- readTree
     let tree = fromMaybe emptyTree fromDisk
-    let st = toState tree & lastSavedTree ?~ tree
+    let st   = toState tree & lastSavedTree ?~ tree
     void $ defaultMain theApp st
-
 
 
 -----------------------------------------------------------------
@@ -77,17 +72,13 @@ handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do
 handleEv st _ = continue st
 
 
-
 listers :: [Event]
 listers = map (\k -> EvKey k []) [KUp, KDown, KHome, KEnd, KPageDown, KPageUp]
-
-
 
 
 -----------------------------------------------------------------
 --     M o v i n g    a r o u n d   t h e    t r e e
 -----------------------------------------------------------------
-
 
 -- | Makes some kind of transformation to the tree. Uses a function
 -- that takes the index of the selected element in the List and
@@ -99,10 +90,8 @@ listers = map (\k -> EvKey k []) [KUp, KDown, KHome, KEnd, KPageDown, KPageUp]
 moveAround :: ((Int, Zipper) -> Maybe (Int, Zipper)) -> PState -> PState
 moveAround f st = fromMaybe st $ do
     (n, (e,z)) <- listSelectedElement (st^.theList)
-    (n', z') <- f (n, z)
+    (n', z')   <- f (n, z)
     return $ zipperToState st z' & theList %~ listMoveTo n'
-
-
 
 
 -----------------------------------------------------------------
@@ -122,7 +111,6 @@ moveToParent' (n, z)
     | isFirstLevelOrRoot z = Nothing
     | otherwise = return (n', z)
     where n' = n - 1 - countNodesBeforeParent z
-
 
 
 -- | The tree is fully expanded. All nodes become visible.
@@ -159,7 +147,7 @@ sortEntries = moveAround sortEntries'
 sortEntries' :: (Int, Zipper) -> Maybe (Int, Zipper)
 sortEntries' (n, z) = return (n, z')
   where on t = rootLabel t ^. itsText
-        z' = modifyTree (applyToForest $ sortOn on) z
+        z'   = modifyTree (applyToForest $ sortOn on) z
         -- z'   = fromTree $ applyToForest (sortOn on) (tree z)
 
 
@@ -182,10 +170,10 @@ dragBelow = moveAround dragBelow'
 
 dragBelow' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragBelow' (n, z) = do
-    let t  = tree z
-    t' <- nextTree $ Z.delete z
+    let t  =  tree z
+    t'     <- nextTree $ Z.delete z
     let z' =  nextSpace t'
-    let n' = n + countVisible (tree t')
+    let n' =  n + countVisible (tree t')
     return  (n' , Z.insert t z')
 
 
@@ -195,10 +183,10 @@ dragAbove = moveAround dragAbove'
 
 dragAbove' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragAbove' (n, z) = do
-    let t  = tree z
-    t' <- prevTree $ Z.delete z
+    let t  =  tree z
+    t'     <- prevTree $ Z.delete z
     let z' =  prevSpace t'
-    let n' = n - countVisible (tree t')
+    let n' =  n - countVisible (tree t')
     return  (n' , Z.insert t z')
 
 

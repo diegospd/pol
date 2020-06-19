@@ -1,13 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module AppDraw (myDraw, theAttrMap)
-
-
 where
 
 import Utils
 import Types
-
 
 import Brick.Widgets.Core
 import Brick.Widgets.Border
@@ -18,6 +15,8 @@ import Data.Tree
 import Data.Tree.Zipper as Z
 import Graphics.Vty
 import qualified Data.Text as T
+
+
 debug_flag = False
 
 
@@ -40,35 +39,32 @@ helpUI = [ ( "Esc"            , "quit no save"  )
          , ( "h"              , "show/hide this")
          ]
 
-
-
 displayHelp :: Bool -> Widget n
 displayHelp True  = hCenter $ twoColumns helpUI
 displayHelp False = padLeft (Pad 3) $ str offerHelp
     where offerHelp = "Press h to show help"
 
-
 twoColumns :: [(Text,Text)] -> Widget n
 twoColumns ls = joinH left <+> center <+> joinH right
-    where half = ceiling $  fromIntegral (length ls) / 2
+    where half          = ceiling $  fromIntegral (length ls) / 2
           (left, right) = splitAt half ls
-          center = str $ replicate 10 ' '
+          center        = str $ replicate 10 ' '
 
 joinH :: [(Text,Text)] -> Widget n
 joinH xs = vBox as <+> vBox bs
     where as = map (txt . fst) xs
           bs = map (\x -> txt $ " - " <> snd x) xs
 
+
 -----------------------last save------------------------------
+
 hasChanges :: PState -> Bool
 hasChanges st  = Just (st^.theTree) /= st^.lastSavedTree
 
-
 lastSave :: PState -> Widget N
 lastSave st
-    | hasChanges st =  str "Save changes with Ctrl-s"
-    | otherwise = str "No changes to save"
-
+    | hasChanges st = str "Save changes with Ctrl-s"
+    | otherwise     = str "No changes to save"
 
 
 --------------------------------------------------------------
@@ -82,11 +78,7 @@ myDraw st = do
     return $ vBox [list, help, saved, debug]
 
 
-
-
-
 ----------------------------------------------------------
-
 
 drawDepth :: (Entry, Zipper) -> Widget n
 drawDepth (e, z)
@@ -95,12 +87,10 @@ drawDepth (e, z)
        where step  = str "  │  "
              last  = str "  └──"
 
-
 drawText :: Entry -> Widget n
 drawText e = case e^.itsDepth of
     1 -> txt $ "[" <> e^.itsText <> "]"
     _ -> txt (e^.itsText)
-
 
 drawBullet :: (Entry, Zipper) -> Widget n
 drawBullet (e, z)
@@ -108,13 +98,11 @@ drawBullet (e, z)
     | hasChildren z                   = str "  ♦ "
     | otherwise                       = str "  · "
 
-
 drawList :: PState -> Widget N
 drawList st
     | isEmpty (st^.theTree) = center $ str "  Such an empty tree..." <=> str "Press 'a' to add and entry"
     | otherwise = padAll 2  ls
     where ls = drawBorder st $ renderList (renderEntry st) True (st^.theList)
-
 
 drawBorder :: PState -> Widget n -> Widget n
 drawBorder st = withBorderStyle b1 . border . withBorderStyle b2 . border
@@ -126,7 +114,6 @@ drawBorder' st
     | hasChanges st = (unicodeBold, unicodeBold)
     | otherwise = (unicode, borderStyleFromChar ' ')
 
-
 drawDecoration :: (Entry, Zipper) -> Widget n
 drawDecoration (e,z) =  drawDepth (e,z) <+>  drawBullet (e,z)
 
@@ -136,10 +123,6 @@ renderEntry st True (e,z)
     | st^.inEditMode = drawDecoration (e,z) <+> renderEditor (txt . T.concat) True (st ^. theEditor)
     | otherwise = drawDecoration (e,z) <+> drawText e
 
-
-
-
-
 -- | Looks ugly; won't use for now.
 tagWithNumOfSons :: Zipper -> Widget n
 tagWithNumOfSons z = str $ "  [" <> fstLvl <> "|" <> total <> "]"
@@ -147,10 +130,7 @@ tagWithNumOfSons z = str $ "  [" <> fstLvl <> "|" <> total <> "]"
          total = show . subtract 1 . length . flatten . tree $ z
 
 
-
-
 ------------------------debug--------------------------------------
-
 
 drawInfo :: PState -> Widget N
 drawInfo st = if debug_flag then info' st else emptyWidget
@@ -166,8 +146,8 @@ debug_entry :: (Entry,Zipper) -> String
 debug_entry (e,_) = "Collapsed:" ++ show (e^.isCollapsed) ++ "   " ++
                 "Visible: " ++ show (e^.isVisible) ++ "   " ++ show (e^.itsText)
 
---------------------------------------------------------------
 
+--------------------------------------------------------------
 
 theAttrMap _ = attrMap defAttr
               [ (listSelectedAttr,  blue `on`  cyan)]

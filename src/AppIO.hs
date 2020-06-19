@@ -24,7 +24,6 @@ checkOrCreate = do
     unless b $ touch file
     return b
 
-
 writeTree :: Tree Entry -> IO ()
 writeTree t = do
     exists <- checkOrCreate
@@ -40,5 +39,3 @@ readTree = do
         else do
             text <- readTextFile file
             return $ decode (cs text) 
-
-

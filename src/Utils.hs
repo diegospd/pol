@@ -13,7 +13,6 @@ module Utils
     )
 where
 
-
 import Lens.Micro.Platform
 import qualified Data.Vector as V
 import Data.Tree
@@ -36,11 +35,11 @@ import Data.Default         as X
 import Data.Char            as X
 import Data.Either          as X
 
+
 (!!!) :: [a] -> Int -> Maybe a
 (!!!) xs n
     | length xs <= n = Nothing
     | otherwise = Just $ xs !! n
-
 
 -- | Applies a function only to the root of a Tree.
 applyToRoot :: (a -> a) -> Tree a -> Tree a
@@ -54,11 +53,8 @@ applyToAllButRoot f (Node e ts) = Node e $ map (fmap f) ts
 applyToFirstGen :: (a -> a) -> Tree a -> Tree a
 applyToFirstGen f (Node e ts) = Node e $ map (applyToRoot f) ts
 
-
-
 applyToForest :: ([Tree a] -> [Tree a]) -> Tree a -> Tree a
 applyToForest f (Node e ts) = Node e (f ts)
-
 
 replaceZipper :: Text -> b -> TextZipper Text 
 replaceZipper t  = const $ textZipper [t] (Just 1)

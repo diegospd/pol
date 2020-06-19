@@ -12,14 +12,11 @@ someFunc :: IO ()
 someFunc = runTheApp
 -- someFunc = runMyApp
 
-
 runMyApp :: IO ()
 runMyApp = void $ defaultMain theApp (mkState aTree)
 
-
 mkState :: Tree Text -> PState
 mkState = toState .  textTreeToETree
-
 
 aTree :: Tree Text
 aTree = Node "root" [ Node "first line"
@@ -45,4 +42,3 @@ aTree = Node "root" [ Node "first line"
                           , Node "4d" []
                           ]
                     ]
-
