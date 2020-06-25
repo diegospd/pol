@@ -17,5 +17,5 @@ cabal.sandbox.config
 *.aux
 *.hp
 *.eventlog
-cabal.project.local
+[]cabal.project.local
 .HTF/

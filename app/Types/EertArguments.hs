@@ -1,5 +1,3 @@
 module Types.EertArguments where
 
-data EertArgs = EertArgs
-  {filename      :: String
-  }
+newtype EertArgs = EertArgs {filename :: String}
