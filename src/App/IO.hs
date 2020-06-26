@@ -1,38 +1,32 @@
 {-# LANGUAGE OverloadedStrings #-}
-
 module App.IO where
+
+import Prelude hiding (FilePath)
 
 import Types.Base
 import Types.ETree
-
-import Data.Aeson
-import Prelude hiding (FilePath)
-import Turtle
 import Data.String.Conversions(cs)
 
+import qualified Data.Aeson as Json
+import qualified Turtle     as Sh
 
-getSaveFile :: FilePath -> IO FilePath
-getSaveFile saveFile = home >>= \h -> return $ h </> saveFile
 
 checkOrCreate :: FilePath -> IO Bool
 checkOrCreate saveFile = do
-    file <- getSaveFile saveFile
-    b    <- testfile file
-    unless b $ touch file
-    return b
+    exists <- Sh.testfile saveFile
+    unless exists $ Sh.touch saveFile
+    return exists
 
 writeTree :: FilePath -> Tree Entry -> IO ()
 writeTree saveFile t = do
     exists <- checkOrCreate saveFile
-    file   <- getSaveFile saveFile
-    writeTextFile file (cs $ encode t)
+    Sh.writeTextFile saveFile (cs $ Json.encode t)
 
 readTree :: FilePath -> IO (Maybe (Tree Entry))
 readTree saveFile = do
-    file   <- getSaveFile saveFile
-    exists <- testfile file
+    exists <- Sh.testfile saveFile
     if not exists
         then return Nothing
         else do
-            text <- readTextFile file
-            return $ decode (cs text)
+            text <- Sh.readTextFile saveFile
+            return $ Json.decode (cs text)
