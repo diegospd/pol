@@ -6,7 +6,7 @@ import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree
 import Types.EState
-import Types.Brick
+import Types.Brick as Brick
 
 import qualified Data.Vector as V
 import qualified Data.Tree as T
@@ -14,7 +14,7 @@ import qualified Data.Tree.Zipper as Tz
 
 
 
-toList :: ETree -> List N (Entry, Zipper)
+toList :: ETree -> Brick.List Brick.N (Entry, Zipper)
 toList t = list "theList" es 1
     where es = V.fromList $ filter ((^.isVisible) . fst) $ T.flatten $ toETreeL t
     -- where es = V.fromList $ {-filter (^.isVisible) $-} flatten $ toETreeL t

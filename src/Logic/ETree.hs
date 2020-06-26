@@ -55,4 +55,4 @@ eqByText t1 t2 = (f <$> t1) == (f <$> t2)
     where f = (^.itsText)
 
 emptyTree :: ETree
-emptyTree = fixTree $ Node (Entry.textToEntry "root") []
+emptyTree = fixTree $ Node (Entry.fromText "root") []

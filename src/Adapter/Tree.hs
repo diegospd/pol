@@ -9,7 +9,7 @@ import Adapter.Entry as Entry
 import Logic.ETree as ETree
 
 textTreeToETree :: Tree Text -> ETree
-textTreeToETree = ETree.fixTree . fmap Entry.textToEntry
+textTreeToETree = ETree.fixTree . fmap Entry.fromText
 
 mkState :: Tree Text -> EState
 mkState = toState . textTreeToETree

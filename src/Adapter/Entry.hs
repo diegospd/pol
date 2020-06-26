@@ -6,9 +6,9 @@ import Prelude hiding (FilePath)
 
 
 -- | Makes an Entry out of some Text.
-textToEntry :: Text -> Entry
-textToEntry x = En { _itsText     = x
-                   , _isCollapsed = True
-                   , _isVisible   = False
-                   , _itsDepth    = -1
-                   }
+fromText :: Text -> Entry
+fromText x = En { _itsText     = x
+                , _isCollapsed = True
+                , _isVisible   = False
+                , _itsDepth    = -1
+                }

@@ -41,7 +41,7 @@ runTheApp saveFile = do
     void $ Brick.defaultMain (theApp saveFile) st
 
 emptyNode :: ETree
-emptyNode = Node (Entry.textToEntry "") []
+emptyNode = Node (Entry.fromText "") []
 
 -----------------------------------------------------------------
 --               E v e n t    H a n d l e r
