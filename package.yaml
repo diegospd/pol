@@ -33,6 +33,8 @@ dependencies:
 - string-conversions
 - turtle
 - vty
+- exceptions
+- transformers
 
 library:
   source-dirs: src

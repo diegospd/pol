@@ -37,6 +37,8 @@ library
       Logic.Tree
       Logic.Zipper
       StartApp
+      Types.App
+      Types.AppConfig
       Types.Base
       Types.Brick
       Types.EState
@@ -51,11 +53,13 @@ library
     , brick
     , containers
     , data-default
+    , exceptions
     , microlens-platform
     , rosezipper
     , string-conversions
     , text
     , text-zipper
+    , transformers
     , turtle
     , vector
     , vty
@@ -78,12 +82,14 @@ executable eert
     , containers
     , data-default
     , eert
+    , exceptions
     , microlens-platform
     , optparse-applicative
     , rosezipper
     , string-conversions
     , text
     , text-zipper
+    , transformers
     , turtle
     , vector
     , vty
@@ -104,11 +110,13 @@ test-suite eert-test
     , containers
     , data-default
     , eert
+    , exceptions
     , microlens-platform
     , rosezipper
     , string-conversions
     , text
     , text-zipper
+    , transformers
     , turtle
     , vector
     , vty
