@@ -8,7 +8,7 @@ import Data.Monoid ((<>))
 import Types.Base
 import Prelude hiding(FilePath)
 import Types.CliArguments (CliArgs(..))
-import Types.EertArguments (EertArgs(..))
+import Types.EertArguments (AppArgs(..))
 
 import qualified Adapter.Arguments as Arguments
 import StartApp(runTheApp)
@@ -32,8 +32,8 @@ sample = CliArgs
             <> OA.value "~/.eert.main.json"
             <> OA.help "Loads tree in FILE" )
 
-operationMode (EertArgs filename) = runTheApp filename
+operationMode (AppArgs filename) = runTheApp filename
 
 -- | Show options, no gui
-greet :: EertArgs -> IO ()
-greet (EertArgs filename) = putStrLn $ "Filename input: " <> show filename
+greet :: AppArgs -> IO ()
+greet (AppArgs filename) = putStrLn $ "Filename input: " <> show filename
