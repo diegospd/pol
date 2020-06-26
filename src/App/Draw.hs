@@ -8,7 +8,6 @@ import qualified Data.Text as T
 import Data.Tree
 import Data.Tree.Zipper as Z
 import Graphics.Vty
-import Lens.Micro.Platform
 
 import Logic.List as L
 import Logic.ETree as ETree

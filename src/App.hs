@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module App where
 
-
+import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree
 import Types.EState
@@ -15,9 +15,9 @@ import Logic.Zipper as Zipper
 import Adapter.ETree as ETree
 import Adapter.Entry as Entry
 
-import App.IO
+import App.IO as IO
 import App.Draw
-import Lens.Micro.Platform
+
 import Data.Tree.Zipper as Z
 import Data.Tree
 import Graphics.Vty
@@ -33,9 +33,9 @@ theApp  = App { appDraw         = myDraw
               , appAttrMap      = theAttrMap
               }
 
-runTheApp :: IO ()
-runTheApp = do
-    fromDisk <- readTree
+runTheApp :: FilePath -> IO ()
+runTheApp filename = do
+    fromDisk <- IO.readTree filename
     let tree = fromMaybe ETree.emptyTree fromDisk
     let st   = toState tree & lastSavedTree ?~ tree
     void $ defaultMain theApp st
@@ -77,7 +77,7 @@ handleEv st (VtyEvent (EvKey (KChar 'c') [MCtrl] )) = continue' st $ expandAll s
 handleEv st (VtyEvent (EvKey (KChar 's') []      )) = continue' st $ sortEntries st
 handleEv st (VtyEvent (EvKey (KChar 'z') [MCtrl] )) = continue $ rewind st
 handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do
-    liftIO (writeChanges st)
+    liftIO (writeChanges saveFile st)
     let st' = st & lastSavedTree ?~ st^.theTree
     continue st'
 
@@ -325,8 +325,8 @@ rewind st
 
 
 -- | Writes the tree to disk
-writeChanges :: EState -> IO ()
-writeChanges st = writeTree (st^.theTree)
+writeChanges :: FilePath -> EState -> IO ()
+writeChanges saveFile st = IO.writeTree saveFile (st^.theTree)
 
 
 getCurrentLineList :: EState -> Text

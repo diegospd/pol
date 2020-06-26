@@ -1,6 +1,7 @@
 module Logic.EState where
 
 import Types.EState
+import Types.Base
 import Types.ETree
 import Logic.ETree as ETree
 import Data.Tree.Zipper as Z

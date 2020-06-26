@@ -2,24 +2,24 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DeriveGeneric #-}
 module Types.ETree (
-      ETree -- (..)
+      ETree(..)
     , Zipper(..)
     , Empty(..)
     , Full(..)
     , Entry(..)
     , HasEntry(..)
-    , module X
+    , T.Tree(..)
     )
 where
 import Data.Tree.Zipper (Full (..), Empty (..))
-import Types.Base as X
+
 import Types.Base
+import Data.Tree as T
 import GHC.Generics
-import Lens.Micro.Platform
 import Data.Aeson(FromJSON, ToJSON)
 
 -- | The main Tree for the state.
-type ETree  = Tree Entry
+type ETree  = T.Tree Entry
 
 -- | Intermediate Tree for building a List.
 type ETreeL = Tree (Entry, Zipper)

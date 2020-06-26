@@ -9,9 +9,9 @@ module Types.EState
 where
 
 import GHC.Generics
-import Lens.Micro.Platform
 import Types.Brick (Editor (..), List (..), N (..))
 import Types.ETree
+import Types.Base
 
 data EState
   = St

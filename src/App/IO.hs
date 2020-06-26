@@ -14,25 +14,25 @@ saveFile :: FilePath
 saveFile = ".pol_tree"
 -- saveFile = "/home/your_user/some_dir/use_this_file.json"
 
-getSaveFile :: IO FilePath
-getSaveFile = home >>= \h -> return $ h </> saveFile
+getSaveFile :: FilePath -> IO FilePath
+getSaveFile saveFile = home >>= \h -> return $ h </> saveFile
 
-checkOrCreate :: IO Bool
-checkOrCreate = do
-    file <- getSaveFile
+checkOrCreate :: FilePath -> IO Bool
+checkOrCreate saveFile = do
+    file <- getSaveFile saveFile
     b    <- testfile file
     unless b $ touch file
     return b
 
-writeTree :: Tree Entry -> IO ()
-writeTree t = do
-    exists <- checkOrCreate
-    file   <- getSaveFile
+writeTree :: FilePath -> Tree Entry -> IO ()
+writeTree saveFile t = do
+    exists <- checkOrCreate saveFile
+    file   <- getSaveFile saveFile
     writeTextFile file (cs $ encode t)
 
-readTree :: IO (Maybe (Tree Entry))
-readTree = do
-    file   <- getSaveFile
+readTree :: FilePath -> IO (Maybe (Tree Entry))
+readTree saveFile = do
+    file   <- getSaveFile saveFile
     exists <- testfile file
     if not exists
         then return Nothing
