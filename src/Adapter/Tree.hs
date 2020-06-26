@@ -11,5 +11,5 @@ import Logic.ETree as ETree
 textTreeToETree :: Tree Text -> ETree
 textTreeToETree = ETree.fixTree . fmap Entry.fromText
 
-mkState :: Tree Text -> EState
-mkState = toState . textTreeToETree
+textTreeToEState :: Tree Text -> EState
+textTreeToEState = ETree.toState . textTreeToETree

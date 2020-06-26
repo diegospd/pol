@@ -15,4 +15,4 @@ isFirstLevelOrRoot z = maybe True X.isRoot (X.parent z)
 
 zipETree :: ETree.Zipper -> ETree -> Tree (Entry, Zipper)
 zipETree z (Node e ts) = Node (e, z) (zipWith zipETree zs ts)
-    where zs = [fromJust $ X.childAt (n-1) z | n <- [1 .. length ts] ]
+    where zs = [fromJust $ X.childAt (n-1) z | n <- [1 .. length ts]]
