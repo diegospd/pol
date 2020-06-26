@@ -10,9 +10,6 @@ import Prelude hiding (FilePath)
 import Turtle
 import Data.String.Conversions(cs)
 
-saveFile :: FilePath
-saveFile = ".pol_tree"
--- saveFile = "/home/your_user/some_dir/use_this_file.json"
 
 getSaveFile :: FilePath -> IO FilePath
 getSaveFile saveFile = home >>= \h -> return $ h </> saveFile
