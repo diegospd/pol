@@ -9,18 +9,18 @@ import Types.EState
 import Types.Brick as Brick
 
 import qualified Data.Vector as V
-import qualified Data.Tree as T
+import qualified Logic.Tree as T
 import qualified Data.Tree.Zipper as Tz
 
 
 
 toList :: ETree -> Brick.List Brick.N (Entry, Zipper)
 toList t = list "theList" es 1
-    where es = V.fromList $ filter ((^.isVisible) . fst) $ T.flatten $ toETreeL t
-    -- where es = V.fromList $ {-filter (^.isVisible) $-} flatten $ toETreeL t
+    where es = V.fromList $ filter ((^.isVisible) . fst) $ T.flatten $ toTree t
+    -- where es = V.fromList $ {-filter (^.isVisible) $-} flatten $ toTree t
 
-toETreeL :: ETree -> Tree (Entry, Zipper)
-toETreeL t = setZippers (Tz.fromTree t) t
+toTree :: ETree -> Tree (Entry, Zipper)
+toTree t = setZippers (Tz.fromTree t) t
 
 setZippers :: Zipper -> ETree -> Tree (Entry, Zipper)
 setZippers z (Node e ts) = Node (e, z) (zipWith setZippers zs ts)

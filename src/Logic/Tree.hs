@@ -1,8 +1,17 @@
-module Logic.Tree where
+module Logic.Tree
+ (applyToRoot,
+ applyToAllButRoot,
+ applyToFirstGen,
+ applyToForest,
+ module X
+ )
+ where
 
 import Types.Base
 import Prelude hiding (FilePath)
 import Types.ETree
+
+import Data.Tree as X
 
 -- | Applies a function only to the root of a Tree.
 applyToRoot :: (a -> a) -> Tree a -> Tree a
