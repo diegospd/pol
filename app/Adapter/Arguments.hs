@@ -1,4 +1,4 @@
-module Adapters.Arguments where
+module Adapter.Arguments where
 import Types.CliArguments (CliArgs(..))
 import Types.EertArguments (EertArgs(..))
 

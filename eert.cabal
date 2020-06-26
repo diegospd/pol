@@ -52,7 +52,7 @@ library
 executable eert
   main-is: Main.hs
   other-modules:
-      Adapters.Arguments
+      Adapter.Arguments
       Types.CliArguments
       Types.EertArguments
       Paths_eert

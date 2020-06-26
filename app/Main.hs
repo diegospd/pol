@@ -7,7 +7,7 @@ import           Data.Monoid ((<>))
 import           Types.CliArguments (CliArgs(..))
 import           Types.EertArguments (EertArgs(..))
 
-import qualified Adapters.Arguments as Adapt
+import qualified Adapter.Arguments as Adapt
 import Start
 
 
