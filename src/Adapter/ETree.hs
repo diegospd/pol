@@ -1,10 +1,23 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Adapter.ETree where
+
+import Adapter.Tree
 
 import Types.Base
 import Types.ETree
 import Types.Brick
 import qualified Data.Vector as V
+import qualified Data.Tree as T
+import qualified Data.Tree.Zipper as Tz
 
+
+-- | Makes an Entry out of some Text.
+textToEntry :: Text -> Entry
+textToEntry x = En { _itsText     = x
+                   , _isCollapsed = True
+                   , _isVisible   = False
+                   , _itsDepth    = -1
+                   }
 
 textTreeToETree :: Tree Text -> ETree
 textTreeToETree = fixTree . fmap textToEntry
@@ -30,12 +43,12 @@ setDepths n (Node e ts) = Node (e & itsDepth .~ n) $ map (setDepths (n+1)) ts
 
 toList :: ETree -> List N (Entry, Zipper)
 toList t = list "theList" es 1
-    where es = V.fromList $ filter ((^.isVisible) . fst) $ flatten $ toETreeL t
+    where es = V.fromList $ filter ((^.isVisible) . fst) $ T.flatten $ toETreeL t
     -- where es = V.fromList $ {-filter (^.isVisible) $-} flatten $ toETreeL t
 
 toETreeL :: ETree -> Tree (Entry, Zipper)
-toETreeL t = setZippers (fromTree t) t
+toETreeL t = setZippers (Tz.fromTree t) t
 
 setZippers :: Zipper -> ETree -> Tree (Entry, Zipper)
 setZippers z (Node e ts) = Node (e, z) (zipWith setZippers zs ts)
-    where zs = [fromJust $ childAt (n-1) z | n <- [1 .. length ts] ]
+    where zs = [fromJust $ Tz.childAt (n-1) z | n <- [1 .. length ts] ]

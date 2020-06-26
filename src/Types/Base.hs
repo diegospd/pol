@@ -16,9 +16,10 @@ import Data.Either as X
 import Data.List as X
 import Data.Maybe as X
 import Data.Monoid as X
+import Lens.Micro.Platform as X
 import Data.Text (Text (..))
 import Data.Tree
 import Data.Tree.Zipper (TreePos (..))
 import qualified Data.Vector as V
 import Data.Vector (Vector (..))
-import Lens.Micro.Platform
+

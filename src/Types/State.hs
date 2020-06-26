@@ -1,7 +1,15 @@
-module Types.State where
-import Types.Brick (N(..))
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric #-}
 
-data PState = St { _theTree       :: ETree
+module Types.State where
+
+import Types.Brick (N(..), List(..), Editor(..))
+import Types.ETree
+import GHC.Generics
+import Lens.Micro.Platform
+
+data EState = St { _theTree       :: ETree
                  , _theList       :: List N (Entry, Zipper)
                  , _theEditor     :: Editor Text N
                  , _inEditMode    :: Bool
@@ -11,5 +19,4 @@ data PState = St { _theTree       :: ETree
                  , _rewinder      :: [(Maybe Int, ETree)]
                  } deriving Show
 
-makeClassy ''Entry
-makeClassy ''PState
+makeClassy ''EState
