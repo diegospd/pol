@@ -30,6 +30,9 @@ dependencies:
 - vector
 - brick
 - text-zipper
+- string-conversions
+- turtle
+- vty
 
 library:
   source-dirs: src

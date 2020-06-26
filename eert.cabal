@@ -27,11 +27,16 @@ library
   exposed-modules:
       Adapter.ETree
       Adapter.Tree
+      App
+      App.Draw
+      App.IO
+      Logic.ETree
+      Logic.List
       Start
       Types.Base
       Types.Brick
+      Types.EState
       Types.ETree
-      Types.State
   other-modules:
       Paths_eert
   hs-source-dirs:
@@ -44,9 +49,12 @@ library
     , data-default
     , microlens-platform
     , rosezipper
+    , string-conversions
     , text
     , text-zipper
+    , turtle
     , vector
+    , vty
   default-language: Haskell2010
 
 executable eert
@@ -69,9 +77,12 @@ executable eert
     , microlens-platform
     , optparse-applicative
     , rosezipper
+    , string-conversions
     , text
     , text-zipper
+    , turtle
     , vector
+    , vty
   default-language: Haskell2010
 
 test-suite eert-test
@@ -91,7 +102,10 @@ test-suite eert-test
     , eert
     , microlens-platform
     , rosezipper
+    , string-conversions
     , text
     , text-zipper
+    , turtle
     , vector
+    , vty
   default-language: Haskell2010

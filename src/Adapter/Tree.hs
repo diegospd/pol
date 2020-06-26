@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Adapter.Tree where
 
 import Types.Base

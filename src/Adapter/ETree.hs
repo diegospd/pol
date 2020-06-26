@@ -5,7 +5,10 @@ import Adapter.Tree
 
 import Types.Base
 import Types.ETree
+import Types.EState
 import Types.Brick
+import Logic.ETree as ETree
+
 import qualified Data.Vector as V
 import qualified Data.Tree as T
 import qualified Data.Tree.Zipper as Tz
@@ -52,3 +55,17 @@ toETreeL t = setZippers (Tz.fromTree t) t
 setZippers :: Zipper -> ETree -> Tree (Entry, Zipper)
 setZippers z (Node e ts) = Node (e, z) (zipWith setZippers zs ts)
     where zs = [fromJust $ Tz.childAt (n-1) z | n <- [1 .. length ts] ]
+
+
+-- | Makes a EState out of an ETree. Should be useful when
+-- reading an ETree from disk.
+toState :: ETree -> EState
+toState t = St { _theTree        = t
+                , _theList       = toList t
+                , _theEditor     = editorText "theEditor" (Just 1) ""
+                , _inEditMode    = False
+                , _showingHelp   = ETree.isEmpty t
+                , _lastSavedTree = Nothing
+                , _minorChanges  = True
+                , _rewinder      = []
+                }

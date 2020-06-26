@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Types.Base
   ( Text (..),
     Vector (..),
