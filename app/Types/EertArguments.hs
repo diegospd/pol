@@ -1,3 +1,7 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Types.EertArguments where
 
-newtype EertArgs = EertArgs {filename :: String}
+import Types.Base (FilePath)
+import Prelude hiding(FilePath)
+
+newtype EertArgs = EertArgs {filename :: FilePath}

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module App where
+module StartApp where
 
 import Prelude hiding (FilePath)
 import Types.Base

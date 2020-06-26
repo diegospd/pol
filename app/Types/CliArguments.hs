@@ -1,6 +1,10 @@
 module Types.CliArguments where
 
+
+import Types.Base
+import Prelude hiding(FilePath)
+
 data CliArgs = CliArgs
-  { filelist :: [String]
-  , filenam  :: String
+  { filelist :: [FilePath]
+  , filename  :: FilePath
   }

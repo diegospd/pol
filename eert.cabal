@@ -28,7 +28,6 @@ library
       Adapter.Entry
       Adapter.ETree
       Adapter.Tree
-      App
       App.Draw
       App.IO
       Logic.EState
@@ -37,7 +36,7 @@ library
       Logic.TextZipper
       Logic.Tree
       Logic.Zipper
-      Start
+      StartApp
       Types.Base
       Types.Brick
       Types.EState

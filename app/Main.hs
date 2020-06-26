@@ -1,17 +1,21 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import Options.Applicative as OA
 import Options.Applicative ((<**>))
 import Data.Monoid ((<>))
+
+import Types.Base
+import Prelude hiding(FilePath)
 import Types.CliArguments (CliArgs(..))
 import Types.EertArguments (EertArgs(..))
 
-import qualified Adapter.Arguments as Adapt
-import Start(runTheApp)
+import qualified Adapter.Arguments as Arguments
+import StartApp(runTheApp)
 
 
 main :: IO ()
-main = greet =<< Adapt.buildArgs <$> OA.execParser opts
+main = operationMode =<< Arguments.build <$> OA.execParser opts
   where
     opts = OA.info (sample <**> OA.helper)
       ( OA.fullDesc
@@ -28,5 +32,8 @@ sample = CliArgs
             <> OA.value "~/.eert.main.json"
             <> OA.help "Loads tree in FILE" )
 
+operationMode (EertArgs filename) = runTheApp filename
+
+-- | Show options, no gui
 greet :: EertArgs -> IO ()
-greet (EertArgs filename) = putStrLn $ "Filename input: " <> filename
+greet (EertArgs filename) = putStrLn $ "Filename input: " <> show filename
