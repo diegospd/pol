@@ -21,6 +21,15 @@ description:         Please see the README on GitHub at <https://github.com/dieg
 
 dependencies:
 - base >= 4.7 && < 5
+- data-default
+- aeson
+- text
+- rosezipper
+- microlens-platform
+- containers
+- vector
+- brick
+- text-zipper
 
 library:
   source-dirs: src
