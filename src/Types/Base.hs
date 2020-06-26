@@ -4,6 +4,7 @@ module Types.Base
     Vector (..),
     Tree (..),
     TreePos (..),
+    FilePath(..),
     module X,
   )
 where
@@ -18,6 +19,8 @@ import Data.List as X
 import Data.Maybe as X
 import Data.Monoid as X
 import Lens.Micro.Platform as X
+import Prelude hiding (FilePath)
+import Turtle (FilePath(..))
 import Data.Text (Text (..))
 import Data.Tree
 import Data.Tree.Zipper (TreePos (..))

@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Start
-    ( someFunc
+    ( runTheApp
     ) where
 
 import Types.Base
@@ -13,9 +13,6 @@ import Adapter.Entry as Entry
 import App(runTheApp)
 import qualified App.IO
 
-someFunc :: IO ()
-someFunc = runTheApp
-
 
 mkState :: Tree Text -> EState
-mkState = toState .  Tree.textTreeToETree
+mkState = toState . Tree.textTreeToETree

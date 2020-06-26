@@ -1,14 +1,13 @@
 module Main where
 
-import           Options.Applicative as OA
-import           Options.Applicative ((<**>))
-import           Data.Monoid ((<>))
-
-import           Types.CliArguments (CliArgs(..))
-import           Types.EertArguments (EertArgs(..))
+import Options.Applicative as OA
+import Options.Applicative ((<**>))
+import Data.Monoid ((<>))
+import Types.CliArguments (CliArgs(..))
+import Types.EertArguments (EertArgs(..))
 
 import qualified Adapter.Arguments as Adapt
-import Start
+import Start(runTheApp)
 
 
 main :: IO ()
