@@ -3,6 +3,7 @@ module Adapter.Tree where
 
 import Types.ETree
 import Types.Base
+import Prelude hiding (FilePath)
 import Types.EState
 import Adapter.Entry as Entry
 import Logic.ETree as ETree

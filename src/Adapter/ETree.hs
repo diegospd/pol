@@ -2,6 +2,7 @@
 module Adapter.ETree where
 
 
+import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree
 import Types.EState

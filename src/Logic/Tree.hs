@@ -1,6 +1,7 @@
 module Logic.Tree where
 
 import Types.Base
+import Prelude hiding (FilePath)
 import Types.ETree
 
 -- | Applies a function only to the root of a Tree.

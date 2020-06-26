@@ -2,6 +2,8 @@ module Adapter.Entry where
 
 import Types.ETree
 import Types.Base
+import Prelude hiding (FilePath)
+
 
 -- | Makes an Entry out of some Text.
 textToEntry :: Text -> Entry

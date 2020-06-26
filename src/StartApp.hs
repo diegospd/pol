@@ -5,7 +5,7 @@ import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree
 import Types.EState
-import Types.Brick
+import Types.Brick as Brick
 
 import Logic.ETree as ETree
 import Logic.Tree as Tree
@@ -25,20 +25,20 @@ import qualified Data.Vector as V
 import qualified Data.Text as T
 import Control.Monad.IO.Class(liftIO)
 
-theApp :: App EState () N
-theApp  = App { appDraw         = myDraw
-              , appChooseCursor = showFirstCursor
-              , appHandleEvent  = handleEv
-              , appStartEvent   = return
-              , appAttrMap      = theAttrMap
-              }
+theApp :: FilePath -> App EState () N
+theApp saveFile = App { appDraw         = myDraw saveFile
+                      , appChooseCursor = showFirstCursor
+                      , appHandleEvent  = handleEv
+                      , appStartEvent   = return
+                      , appAttrMap      = theAttrMap
+                      }
 
 runTheApp :: FilePath -> IO ()
-runTheApp filename = do
-    fromDisk <- IO.readTree filename
-    let tree = fromMaybe ETree.emptyTree fromDisk
-    let st   = toState tree & lastSavedTree ?~ tree
-    void $ defaultMain theApp st
+runTheApp saveFile = do
+    fromDisk <- IO.readTree saveFile
+    let tree  = fromMaybe ETree.emptyTree fromDisk
+    let st    = toState tree & lastSavedTree ?~ tree
+    void $ Brick.defaultMain (theApp saveFile) st
 
 emptyNode :: ETree
 emptyNode = Node (Entry.textToEntry "") []

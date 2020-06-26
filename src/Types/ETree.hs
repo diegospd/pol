@@ -14,6 +14,7 @@ where
 import Data.Tree.Zipper (Full (..), Empty (..))
 
 import Types.Base
+import Prelude hiding (FilePath)
 import Data.Tree as T
 import GHC.Generics
 import Data.Aeson(FromJSON, ToJSON)

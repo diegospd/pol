@@ -13,8 +13,9 @@ import Logic.List as L
 import Logic.ETree as ETree
 
 import Types.Base
+import Prelude hiding (FilePath)
 import Types.ETree
-import Types.Brick
+import Types.Brick as Brick
 import Types.EState
 
 debug_flag = False
@@ -41,7 +42,7 @@ helpUI =
 
 displayHelp :: Bool -> Widget n
 displayHelp True = hCenter $ twoColumns helpUI
-displayHelp False = padLeft (Pad 3) $ str offerHelp
+displayHelp False = padLeft (Pad 3) $ Brick.str offerHelp
   where
     offerHelp = "Press h to show help"
 
@@ -63,19 +64,19 @@ joinH xs = vBox as <+> vBox bs
 hasChanges :: EState -> Bool
 hasChanges st = Just (st ^. theTree) /= st ^. lastSavedTree
 
-lastSave :: EState -> Widget N
-lastSave st
-  | hasChanges st = str "Save changes with Ctrl-s"
-  | otherwise = str "No changes to save"
+lastSave :: FilePath -> EState -> Widget N
+lastSave saveFile st
+  | hasChanges st = Brick.str $ "Save changes with Ctrl-s  " <> show saveFile
+  | otherwise     = Brick.str "No changes to save"
 
 --------------------------------------------------------------
 
-myDraw :: EState -> [Widget N]
-myDraw st = do
-  let list = drawList st
+myDraw :: FilePath -> EState -> [Widget N]
+myDraw saveFile st = do
+  let list  = drawList st
   let debug = drawInfo st
-  let saved = padLeft (Pad 3) . padTopBottom 1 $ lastSave st
-  let help = displayHelp (st ^. showingHelp)
+  let saved = padLeft (Pad 3) . padTopBottom 1 $ lastSave saveFile st
+  let help  = displayHelp (st ^. showingHelp)
   return $ vBox [list, help, saved, debug]
 
 ----------------------------------------------------------

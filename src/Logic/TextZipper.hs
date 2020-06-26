@@ -1,6 +1,7 @@
 module Logic.TextZipper where
 
 import Types.Base
+import Prelude hiding (FilePath)
 import Data.Text.Zipper as Tz
 
 replaceZipper :: Text -> b -> TextZipper Text

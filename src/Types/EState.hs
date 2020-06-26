@@ -12,6 +12,7 @@ import GHC.Generics
 import Types.Brick (Editor (..), List (..), N (..))
 import Types.ETree
 import Types.Base
+import Prelude hiding (FilePath)
 
 data EState
   = St

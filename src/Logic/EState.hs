@@ -2,6 +2,7 @@ module Logic.EState where
 
 import Types.EState
 import Types.Base
+import Prelude hiding (FilePath)
 import Types.ETree
 import Logic.ETree as ETree
 import Data.Tree.Zipper as Z
