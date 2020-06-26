@@ -1,7 +1,12 @@
-module Logic.Zipper where
+module Logic.Zipper
+  ( isFirstLevelOrRoot,
+    module X
+  )
+where
 
-import Types.ETree
-import Data.Tree.Zipper as Z
+import Data.Tree.Zipper as X
+
+import Types.ETree(Zipper(..))
 
 isFirstLevelOrRoot :: Zipper -> Bool
-isFirstLevelOrRoot z = maybe True Z.isRoot (Z.parent z)
+isFirstLevelOrRoot z = maybe True X.isRoot (X.parent z)
