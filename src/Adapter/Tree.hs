@@ -10,7 +10,7 @@ import qualified Logic.ETree   as ETree
 
 
 textTreeToETree :: Tree Text -> ETree
-textTreeToETree = ETree.fixTree . fmap Entry.fromText
+textTreeToETree = ETree.reveal . fmap Entry.fromText
 
 textTreeToEState :: Tree Text -> EState
 textTreeToEState = ETree.toState . textTreeToETree

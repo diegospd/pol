@@ -3,22 +3,23 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Types.EState
-  (EState(..)
+  ( EState(..)
   , HasEState(..)
   )
 where
 
-import GHC.Generics
-import Types.Brick (Editor (..), List (..), N (..))
-import Types.ETree
-import Types.Base
 import Prelude hiding (FilePath)
+import Types.Base
+import GHC.Generics
+import qualified Types.Brick as B
+import Types.ETree
+
 
 data EState
   = St
       { _theTree       :: ETree,
-        _theList       :: List N (Entry, Zipper),
-        _theEditor     :: Editor Text N,
+        _theList       :: B.List B.N (Entry, Zipper),
+        _theEditor     :: B.Editor Text B.N,
         _inEditMode    :: Bool,
         _showingHelp   :: Bool,
         _lastSavedTree :: Maybe ETree,
