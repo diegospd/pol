@@ -8,7 +8,12 @@ import Types.EState
 import Types.Brick
 
 import Logic.ETree as ETree
+import Logic.Tree as Tree
+import Logic.EState as EState
+import Logic.TextZipper as Tz
+import Logic.Zipper as Zipper
 import Adapter.ETree as ETree
+import Adapter.Entry as Entry
 
 import App.IO
 import App.Draw
@@ -31,12 +36,12 @@ theApp  = App { appDraw         = myDraw
 runTheApp :: IO ()
 runTheApp = do
     fromDisk <- readTree
-    let tree = fromMaybe emptyTree fromDisk
+    let tree = fromMaybe ETree.emptyTree fromDisk
     let st   = toState tree & lastSavedTree ?~ tree
     void $ defaultMain theApp st
 
 emptyNode :: ETree
-emptyNode = Node (textToEntry "") []
+emptyNode = Node (Entry.textToEntry "") []
 
 -----------------------------------------------------------------
 --               E v e n t    H a n d l e r
@@ -98,7 +103,7 @@ moveAround :: ((Int, Zipper) -> Maybe (Int, Zipper)) -> EState -> EState
 moveAround f st = fromMaybe st $ do
     (n, (e,z)) <- listSelectedElement (st^.theList)
     (n', z')   <- f (n, z)
-    return $ zipperToState st z' & theList %~ listMoveTo n'
+    return $ EState.zipperToState st z' & theList %~ listMoveTo n'
 
 
 -----------------------------------------------------------------
@@ -115,7 +120,7 @@ moveToParent = moveAround moveToParent'
 
 moveToParent' :: (Int, Zipper) -> Maybe (Int, Zipper)
 moveToParent' (n, z)
-    | isFirstLevelOrRoot z = Nothing
+    | Zipper.isFirstLevelOrRoot z = Nothing
     | otherwise = return (n', z)
     where n' = n - 1 - countNodesBeforeParent z
 
@@ -154,7 +159,7 @@ sortEntries = moveAround sortEntries'
 sortEntries' :: (Int, Zipper) -> Maybe (Int, Zipper)
 sortEntries' (n, z) = return (n, z')
   where on t = rootLabel t ^. itsText
-        z'   = modifyTree (applyToForest $ sortOn on) z
+        z'   = modifyTree (Tree.applyToForest $ sortOn on) z
         -- z'   = fromTree $ applyToForest (sortOn on) (tree z)
 
 
@@ -226,7 +231,7 @@ dragLowerLevel' (n, z) = do
 
 addLineHere :: EState -> EState
 addLineHere st
-    | ETree.isEmpty (st^.theTree) = zipperToState st . snd . fromJust $ addLineBelow' (0, fromTree $ st^.theTree)
+    | ETree.isEmpty (st^.theTree) = EState.zipperToState st . snd . fromJust $ addLineBelow' (0, fromTree $ st^.theTree)
     | otherwise = moveAround addLineHere' st
 
 addLineHere' :: (Int, Zipper) -> Maybe (Int, Zipper)
@@ -259,7 +264,7 @@ editCurrentLine st = st & theEditor  %~ applyEdit replaceOrKeep
                         & inEditMode .~ inEdit
     where line = getCurrentLineList st
           inEdit = not $ T.null line
-          replaceOrKeep = if inEdit then replaceZipper line else id
+          replaceOrKeep = if inEdit then Tz.replaceZipper line else id
 
 
 -- | If the old and new texts are both empty, then the current node
@@ -315,7 +320,7 @@ rewind :: EState -> EState
 rewind st
     | null (st^.rewinder) = st
     | otherwise = let ((mn, prev):rest) = st^.rewinder
-                      st' = ETree.toState st prev
+                      st' = EState.transition st prev
                   in st' & rewinder .~ rest & theList . listSelectedL .~ mn
 
 

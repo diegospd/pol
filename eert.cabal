@@ -25,13 +25,18 @@ source-repository head
 
 library
   exposed-modules:
+      Adapter.Entry
       Adapter.ETree
       Adapter.Tree
       App
       App.Draw
       App.IO
+      Logic.EState
       Logic.ETree
       Logic.List
+      Logic.TextZipper
+      Logic.Tree
+      Logic.Zipper
       Start
       Types.Base
       Types.Brick
