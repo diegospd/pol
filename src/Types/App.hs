@@ -1,39 +1,31 @@
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE RankNTypes #-}
+
 module Types.App where
 
-import qualified Types.Brick as B
-import Types.Base
-import Types.AppConfig(Config(..))
 --
---import Control.Monad.Catch (MonadThrow, MonadCatch, MonadMask)
+import Control.Monad.Catch (MonadThrow, MonadCatch, MonadMask)
 --import Control.Monad.Trans.State.Lazy
---import Control.Monad.Fail (MonadFail)
-import Control.Monad.Trans.Reader
+import Control.Monad.Fail (MonadFail)
+
 --import Control.Monad.IO.Class
---
---
---newtype GuiM a =
---    GuiM { runGui :: ReaderT Config (B.EventM Text a)
---           }
---           deriving ( Functor
---                    , Applicative
---                    , Monad
---                    , MonadIO
---                    , MonadThrow
---                    , MonadCatch
---                    , MonadMask
---                    , MonadFail
---                    )
 
-
-{-# LANGUAGE DeriveFunctor #-}
-import Control.Monad.Trans.Class
 import Control.Monad.IO.Class
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.Reader
 import Data.Functor.Identity
+import Types.AppConfig (Config (..))
+import Types.Base
+import qualified Types.Brick as B
 
-newtype GuiM a = GuiM {runGuiM :: Config -> ReaderT Config Identity a}
+newtype GuiM a
+  = GuiM
+      { runGuiM :: Config -> ReaderT Config (B.EventM Text) a
+      }
+  deriving (Functor)
 
---runReader :: GuiM a -> Config -> a
---runReader guiM config = (runIdentity . runReaderT guiM) config
+
 
 askConfig :: Monad m => ReaderT r m r
 askConfig = undefined
