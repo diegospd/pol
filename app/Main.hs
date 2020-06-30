@@ -32,7 +32,7 @@ sample = CliArgs
             <> OA.value   "~/.eert.main.json"
             <> OA.help    "Loads tree in FILE" )
 
-operationMode (Config filename) = runTheApp filename
+operationMode = runTheApp
 
 -- | Show options, no gui
 greet :: Config -> IO ()

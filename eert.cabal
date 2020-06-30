@@ -69,7 +69,6 @@ executable eert
   main-is: Main.hs
   other-modules:
       Adapter.Arguments
-      Types.AppConfig
       Types.CliArguments
       Paths_eert
   hs-source-dirs:

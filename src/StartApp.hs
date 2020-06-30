@@ -6,6 +6,7 @@ import Types.Base
 import Types.ETree
 import Types.EState
 import Types.Brick as Brick
+import Types.AppConfig (Config(..))
 
 import Logic.ETree as ETree
 import Logic.Tree as Tree
@@ -20,7 +21,7 @@ import App.Draw
 
 import Data.Tree.Zipper as Z
 import Data.Tree
-import Graphics.Vty
+import Graphics.Vty hiding (Config)
 import qualified Data.Vector as V
 import qualified Data.Text as T
 import Control.Monad.IO.Class(liftIO)
@@ -33,8 +34,8 @@ theApp saveFile = App { appDraw         = myDraw saveFile
                       , appAttrMap      = theAttrMap
                       }
 
-runTheApp :: FilePath -> IO ()
-runTheApp saveFile = do
+runTheApp :: Config -> IO ()
+runTheApp (Config saveFile) = do
     fromDisk <- IO.readTree saveFile
     let tree  = fromMaybe ETree.emptyTree fromDisk
     let st    = toState tree & lastSavedTree ?~ tree
