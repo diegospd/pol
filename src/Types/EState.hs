@@ -24,7 +24,8 @@ data EState
         _showingHelp   :: Bool,
         _lastSavedTree :: Maybe ETree,
         _minorChanges  :: Bool, -- True iff current tree is the same than last saved tree except for collapsed nodes
-        _rewinder      :: [(Maybe Int, ETree)]
+        _rewinder      :: [(Maybe Int, ETree)],
+        _saveFile      :: FilePath
       }
   deriving (Show)
 

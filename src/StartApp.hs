@@ -26,20 +26,20 @@ import qualified Data.Vector as V
 import qualified Data.Text as T
 import Control.Monad.IO.Class(liftIO)
 
-theApp :: FilePath -> App EState () N
-theApp saveFile = App { appDraw         = myDraw saveFile
-                      , appChooseCursor = showFirstCursor
-                      , appHandleEvent  = handleEv
-                      , appStartEvent   = return
-                      , appAttrMap      = theAttrMap
-                      }
+theApp :: Config -> App EState () N
+theApp conf@(Config saveFile) = App { appDraw         = myDraw saveFile
+                                    , appChooseCursor = showFirstCursor
+                                    , appHandleEvent  = handleEv conf
+                                    , appStartEvent   = return
+                                    , appAttrMap      = theAttrMap
+                                    }
 
 runTheApp :: Config -> IO ()
-runTheApp (Config saveFile) = do
+runTheApp conf@(Config saveFile) = do
     fromDisk <- IO.readTree saveFile
     let tree  = fromMaybe ETree.emptyTree fromDisk
-    let st    = toState tree & lastSavedTree ?~ tree
-    void $ Brick.defaultMain (theApp saveFile) st
+    let st    = ETree.toState conf tree & lastSavedTree ?~ tree
+    void $ Brick.defaultMain (theApp conf) st
 
 emptyNode :: ETree
 emptyNode = Node (Entry.fromText "") []
