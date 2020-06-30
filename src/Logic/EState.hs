@@ -4,7 +4,7 @@ import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree
 import Types.EState
-import Types.AppConfig (Config(..))
+import Types.AppConfig(Config(..))
 
 import qualified Logic.ETree as ETree
 import qualified Data.Tree.Zipper as Z
@@ -30,6 +30,7 @@ withMinorChanges old new = case old^.lastSavedTree of
 -- new ETree.
 zipperToState :: EState -> Zipper -> EState
 zipperToState old = transition old . Z.toTree
+  where conf = toConfig old
 
 toConfig :: EState -> Config
 toConfig st = Config $ st^.saveFile
