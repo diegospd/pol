@@ -77,8 +77,8 @@ handleEv _conf st (VtyEvent (EvKey (KChar 'p') []      )) = continue $ moveToPar
 handleEv _conf st (VtyEvent (EvKey (KChar 'c') [MCtrl] )) = continue' st $ expandAll st
 handleEv _conf st (VtyEvent (EvKey (KChar 's') []      )) = continue' st $ sortEntries st
 handleEv  conf st (VtyEvent (EvKey (KChar 'z') [MCtrl] )) = continue $ rewind conf st
-handleEv _conf st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do
-    liftIO (writeChanges undefined st)
+handleEv conf st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do
+    liftIO (writeChanges (saveFile conf) st)
     let st' = st & lastSavedTree ?~ st^.theTree
     continue st'
 
