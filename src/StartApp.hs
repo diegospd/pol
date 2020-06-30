@@ -48,41 +48,41 @@ emptyNode = Node (Entry.fromText "") []
 --               E v e n t    H a n d l e r
 -----------------------------------------------------------------
 
-handleEv :: EState -> BrickEvent N () -> EventM N (Next EState)
-handleEv st (VtyEvent (EvKey (KChar 'e') []))
+handleEv :: Config -> EState -> BrickEvent N () -> EventM N (Next EState)
+handleEv _conf st (VtyEvent (EvKey (KChar 'e') []))
     | not (st^.inEditMode) = continue' st $ editCurrentLine st
-handleEv st (VtyEvent (EvKey KEsc []))
+handleEv _conf st (VtyEvent (EvKey KEsc []))
     | st^.inEditMode = continue $ cancelEdit st & inEditMode .~ False
     | otherwise      = halt st
-handleEv st (VtyEvent (EvKey KEnter []))
+handleEv _conf st (VtyEvent (EvKey KEnter []))
     | st^.inEditMode = continue' st $ flushEditor st
     | otherwise      = continue' st $ toggleCollapse st
-handleEv st (VtyEvent (EvKey (KChar 'a') []))
+handleEv _conf st (VtyEvent (EvKey (KChar 'a') []))
     | not (st^.inEditMode) = continue $ addLineHere st & inEditMode .~ True
-handleEv st (VtyEvent (EvKey (KChar 'a') [MCtrl]))
+handleEv _conf st (VtyEvent (EvKey (KChar 'a') [MCtrl]))
     | not (st^.inEditMode) && isNotEmpty (st^.theTree) = continue $ addLineBelow st & inEditMode .~ True
-handleEv st (VtyEvent e)
+handleEv _conf st (VtyEvent e)
     | st^.inEditMode = continue =<< handleEventLensed st theEditor handleEditorEvent e
-handleEv st (VtyEvent e)
+handleEv _conf st (VtyEvent e)
     | e `elem` listers =  continue =<< handleEventLensed st theList handleListEvent e
 
-handleEv st (VtyEvent (EvKey (KChar 'd') [MCtrl] )) = continue' st $ dropCurrent st
-handleEv st (VtyEvent (EvKey KUp         [MCtrl] )) = continue' st $ dragAbove st
-handleEv st (VtyEvent (EvKey KDown       [MCtrl] )) = continue' st $ dragBelow st
-handleEv st (VtyEvent (EvKey KLeft       [MCtrl] )) = continue' st $ dragUpperLevel st
-handleEv st (VtyEvent (EvKey KRight      [MCtrl] )) = continue' st $ dragLowerLevel st
-handleEv st (VtyEvent (EvKey (KChar 'h') []      )) = continue $ st & showingHelp %~ not
-handleEv st (VtyEvent (EvKey (KChar 'c') []      )) = continue' st $ collapseAll st
-handleEv st (VtyEvent (EvKey (KChar 'p') []      )) = continue $ moveToParent st
-handleEv st (VtyEvent (EvKey (KChar 'c') [MCtrl] )) = continue' st $ expandAll st
-handleEv st (VtyEvent (EvKey (KChar 's') []      )) = continue' st $ sortEntries st
-handleEv st (VtyEvent (EvKey (KChar 'z') [MCtrl] )) = continue $ rewind st
-handleEv st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do
+handleEv _conf st (VtyEvent (EvKey (KChar 'd') [MCtrl] )) = continue' st $ dropCurrent st
+handleEv _conf st (VtyEvent (EvKey KUp         [MCtrl] )) = continue' st $ dragAbove st
+handleEv _conf st (VtyEvent (EvKey KDown       [MCtrl] )) = continue' st $ dragBelow st
+handleEv _conf st (VtyEvent (EvKey KLeft       [MCtrl] )) = continue' st $ dragUpperLevel st
+handleEv _conf st (VtyEvent (EvKey KRight      [MCtrl] )) = continue' st $ dragLowerLevel st
+handleEv _conf st (VtyEvent (EvKey (KChar 'h') []      )) = continue $ st & showingHelp %~ not
+handleEv _conf st (VtyEvent (EvKey (KChar 'c') []      )) = continue' st $ collapseAll st
+handleEv _conf st (VtyEvent (EvKey (KChar 'p') []      )) = continue $ moveToParent st
+handleEv _conf st (VtyEvent (EvKey (KChar 'c') [MCtrl] )) = continue' st $ expandAll st
+handleEv _conf st (VtyEvent (EvKey (KChar 's') []      )) = continue' st $ sortEntries st
+handleEv  conf st (VtyEvent (EvKey (KChar 'z') [MCtrl] )) = continue $ rewind conf st
+handleEv _conf st (VtyEvent (EvKey (KChar 's') [MCtrl] )) = do
     liftIO (writeChanges undefined st)
     let st' = st & lastSavedTree ?~ st^.theTree
     continue st'
 
-handleEv st _ = continue st
+handleEv _conf st _ = continue st
 
 
 listers :: [Event]
@@ -317,11 +317,11 @@ continue' old new
 
 
 -- | If the rewinder is not empty, then it restores the previous state.
-rewind :: EState -> EState
-rewind st
+rewind :: Config -> EState -> EState
+rewind conf st
     | null (st^.rewinder) = st
     | otherwise = let ((mn, prev):rest) = st^.rewinder
-                      st' = EState.transition st prev
+                      st' = EState.transition conf st prev
                   in st' & rewinder .~ rest & theList . listSelectedL .~ mn
 
 

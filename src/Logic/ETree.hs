@@ -5,6 +5,7 @@ import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree
 import Types.EState
+import Types.AppConfig(Config(..))
 import qualified Types.Brick   as B
 import qualified Adapter.ETree as ETree
 import qualified Adapter.Entry as Entry
@@ -37,8 +38,8 @@ updateVisibilities t@(Node e ts)
 
 -- | Makes a EState out of an ETree. Should be useful when
 -- reading an ETree from disk.
-toState :: ETree -> EState
-toState t = St { _theTree        = t
+toState :: Config -> ETree -> EState
+toState conf t = St { _theTree        = t
                 , _theList       = ETree.toList t
                 , _theEditor     = B.editorText "theEditor" (Just 1) ""
                 , _inEditMode    = False
@@ -46,6 +47,7 @@ toState t = St { _theTree        = t
                 , _lastSavedTree = Nothing
                 , _minorChanges  = True
                 , _rewinder      = []
+                , _theSaveFile   = saveFile conf
                 }
 
 -- | Says if two trees are equal based only on their structure and their texts.

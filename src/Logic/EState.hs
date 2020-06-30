@@ -4,6 +4,7 @@ import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree
 import Types.EState
+import Types.AppConfig (Config(..))
 
 import qualified Logic.ETree as ETree
 import qualified Data.Tree.Zipper as Z
@@ -17,8 +18,8 @@ setPreviousFlags old new = new & showingHelp   .~ (old^.showingHelp)
 
 
 -- | Makes a new state out of an old state and a new ETree.
-transition :: EState -> ETree -> EState
-transition old = setPreviousFlags old . ETree.toState . ETree.reveal
+transition :: Config -> EState -> ETree -> EState
+transition conf old = setPreviousFlags old . ETree.toState conf . ETree.reveal
 
 withMinorChanges :: EState -> EState -> Bool
 withMinorChanges old new = case old^.lastSavedTree of
@@ -29,3 +30,6 @@ withMinorChanges old new = case old^.lastSavedTree of
 -- new ETree.
 zipperToState :: EState -> Zipper -> EState
 zipperToState old = transition old . Z.toTree
+
+toConfig :: EState -> Config
+toConfig st = Config $ st^.saveFile
