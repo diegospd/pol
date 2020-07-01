@@ -1,0 +1,122 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           pol
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/diegospd/pol#readme>
+homepage:       https://github.com/diegospd/pol#readme
+bug-reports:    https://github.com/diegospd/pol/issues
+author:         Diego Murillo
+maintainer:     diego.spd@gmail.com
+copyright:      2020 Diego Murillo
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/diegospd/pol
+
+library
+  exposed-modules:
+      Adapter.Entry
+      Adapter.ETree
+      Adapter.Tree
+      App.Draw
+      App.IO
+      Logic.EState
+      Logic.ETree
+      Logic.List
+      Logic.TextZipper
+      Logic.Tree
+      Logic.Zipper
+      StartApp
+      Types.App
+      Types.AppConfig
+      Types.Base
+      Types.Brick
+      Types.EState
+      Types.ETree
+  other-modules:
+      Paths_pol
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , brick
+    , containers
+    , data-default
+    , exceptions
+    , microlens-platform
+    , rosezipper
+    , string-conversions
+    , text
+    , text-zipper
+    , transformers
+    , turtle
+    , vector
+    , vty
+  default-language: Haskell2010
+
+executable pol
+  main-is: Main.hs
+  other-modules:
+      Adapter.Config
+      Types.CliArguments
+      Paths_pol
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , brick
+    , containers
+    , data-default
+    , exceptions
+    , microlens-platform
+    , optparse-applicative
+    , pol
+    , rosezipper
+    , string-conversions
+    , text
+    , text-zipper
+    , transformers
+    , turtle
+    , vector
+    , vty
+  default-language: Haskell2010
+
+test-suite pol-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_pol
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , brick
+    , containers
+    , data-default
+    , exceptions
+    , microlens-platform
+    , pol
+    , rosezipper
+    , string-conversions
+    , text
+    , text-zipper
+    , transformers
+    , turtle
+    , vector
+    , vty
+  default-language: Haskell2010
