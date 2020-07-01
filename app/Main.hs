@@ -23,7 +23,7 @@ main = do
     operationMode config
 
 cliParser :: FilePath -> OA.ParserInfo CliArgs
-cliParser homeDir = OA.info (cliInstructions homeDir <**> OA.helper)
+cliParser homeDir = OA.info (cliInstructions homeDir OA.<**> OA.helper)
                    (  OA.fullDesc
                    <> OA.progDesc "Console GUI tree-based note taker"
                    <> OA.header   "you can choose which tree file to load" )
