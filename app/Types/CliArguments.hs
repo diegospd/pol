@@ -7,6 +7,6 @@ import Prelude hiding(FilePath)
 
 data CliArgs = CliArgs
   { filelist :: [FilePath]
-  , filename  :: FilePath
-  , verbose :: Bool
+  , filename :: FilePath
+  , verbose  :: Bool
   }

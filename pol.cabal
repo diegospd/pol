@@ -69,8 +69,10 @@ executable pol
   main-is: Main.hs
   other-modules:
       Adapter.Config
-      IO.Config
+      IO.LocalConfig
+      Logic.Config
       Types.CliArguments
+      Types.LocalConfig
       Paths_pol
   hs-source-dirs:
       app

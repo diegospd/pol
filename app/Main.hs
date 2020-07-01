@@ -4,7 +4,7 @@ module Main where
 
 import Adapter.Config as Config
 import Data.Monoid ((<>))
-import IO.Config (loadLocalConfig)
+import IO.LocalConfig (loadLocalConfig)
 import qualified Options.Applicative as OA
 import StartApp (runTheApp)
 import qualified Turtle as Sh
@@ -59,4 +59,4 @@ greet conf = do
 operationMode :: Config -> IO ()
 operationMode conf = do
   greet conf
-  runTheApp conf
+--  runTheApp conf
