@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Adapter.Arguments where
+module Adapter.Config where
 
 import Types.CliArguments (CliArgs(..))
 import Types.AppConfig (Config(..))

@@ -10,20 +10,21 @@ import Prelude hiding(FilePath)
 import Types.CliArguments  (CliArgs(..))
 import Types.AppConfig (Config(..))
 
-import Adapter.Arguments as Arguments
+import Adapter.Config as Config
 import StartApp(runTheApp)
 
 
 main :: IO ()
-main = operationMode =<< Arguments.build <$> OA.execParser opts
-  where
-    opts = OA.info (sample <**> OA.helper)
-         ( OA.fullDesc
-        <> OA.progDesc "Console GUI tree based note taker"
-        <> OA.header   "you can choose which eert file to load" )
+main = operationMode =<< Config.build <$> OA.execParser cliParser
 
-sample :: OA.Parser CliArgs
-sample = CliArgs
+cliParser :: OA.ParserInfo CliArgs
+cliParser = OA.info (cliInstructions <**> OA.helper)
+                   ( OA.fullDesc
+                   <> OA.progDesc "Console GUI tree based note taker"
+                   <> OA.header   "you can choose which eert file to load" )
+
+cliInstructions :: OA.Parser CliArgs
+cliInstructions = CliArgs
       <$> OA.many (OA.argument OA.str (OA.metavar "FILE"))
       <*> OA.strOption
              ( OA.long    "filename"
