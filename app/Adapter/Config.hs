@@ -8,5 +8,5 @@ import Prelude hiding(FilePath)
 
 
 build :: CliArgs -> Config
-build (CliArgs (file:_) _fallback) = Config file
-build (CliArgs []        fallback) = Config fallback
+build (CliArgs (file:_) _fallback) = Config file False
+build (CliArgs []        fallback) = Config fallback False

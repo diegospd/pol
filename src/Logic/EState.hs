@@ -33,4 +33,4 @@ zipperToState old = transition conf old . Z.toTree
   where conf = toConfig old
 
 toConfig :: EState -> Config
-toConfig st = Config (st^.theSaveFile)
+toConfig st = Config (st^.theSaveFile) undefined

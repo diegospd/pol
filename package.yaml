@@ -35,6 +35,7 @@ dependencies:
 - vty
 - exceptions
 - transformers
+- tce-conf
 
 library:
   source-dirs: src

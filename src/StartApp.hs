@@ -1,45 +1,45 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module StartApp where
 
-import Prelude hiding (FilePath)
-import Types.Base
-import Types.ETree
-import Types.EState
-import Types.Brick as Brick
-import Types.AppConfig (Config(..))
-
-import Logic.ETree as ETree
-import Logic.Tree as Tree
-import Logic.EState as EState
-import Logic.TextZipper as Tz
-import Logic.Zipper as Zipper
 import Adapter.ETree as ETree
 import Adapter.Entry as Entry
-
-import App.IO as IO
 import App.Draw
-
-import Data.Tree.Zipper as Z
-import Data.Tree
-import Graphics.Vty hiding (Config)
-import qualified Data.Vector as V
+import App.IO as IO
+import Control.Monad.IO.Class (liftIO)
 import qualified Data.Text as T
-import Control.Monad.IO.Class(liftIO)
+import Data.Tree
+import Data.Tree.Zipper as Z
+import qualified Data.Vector as V
+import Graphics.Vty hiding (Config)
+import Logic.EState as EState
+import Logic.ETree as ETree
+import Logic.TextZipper as Tz
+import Logic.Tree as Tree
+import Logic.Zipper as Zipper
+import Types.AppConfig (Config (..))
+import Types.Base
+import Types.Brick as Brick
+import Types.EState
+import Types.ETree
+import Prelude hiding (FilePath)
 
 theApp :: Config -> App EState () N
-theApp conf@(Config saveFile) = App { appDraw         = myDraw saveFile
-                                    , appChooseCursor = showFirstCursor
-                                    , appHandleEvent  = handleEv conf
-                                    , appStartEvent   = return
-                                    , appAttrMap      = theAttrMap
-                                    }
+theApp conf@(Config saveFile debug) =
+  App
+    { appDraw         = myDraw saveFile
+    , appChooseCursor = showFirstCursor
+    , appHandleEvent  = handleEv conf
+    , appStartEvent   = return
+    , appAttrMap      = theAttrMap
+    }
 
 runTheApp :: Config -> IO ()
-runTheApp conf@(Config saveFile) = do
-    fromDisk <- IO.readTree saveFile
-    let tree  = fromMaybe ETree.emptyTree fromDisk
-    let st    = ETree.toState conf tree & lastSavedTree ?~ tree
-    void $ Brick.defaultMain (theApp conf) st
+runTheApp conf@(Config saveFile debug) = do
+  fromDisk <- IO.readTree saveFile
+  let tree  = fromMaybe ETree.emptyTree fromDisk
+  let state = ETree.toState conf tree & lastSavedTree ?~ tree
+  void $ Brick.defaultMain (theApp conf) state
 
 emptyNode :: ETree
 emptyNode = Node (Entry.fromText "") []
@@ -121,24 +121,23 @@ moveToParent = moveAround moveToParent'
 
 moveToParent' :: (Int, Zipper) -> Maybe (Int, Zipper)
 moveToParent' (n, z)
-    | Zipper.isFirstLevelOrRoot z = Nothing
-    | otherwise = return (n', z)
-    where n' = n - 1 - countNodesBeforeParent z
-
+  | Zipper.isFirstLevelOrRoot z = Nothing
+  | otherwise = return (n', z)
+  where
+    n' = n - 1 - countNodesBeforeParent z
 
 -- | The tree is fully expanded. All nodes become visible.
 expandAll :: EState -> EState
 expandAll = moveAround (collapseAll' False)
 
-
 -- | The tree is fully collapsed. Only the top level nodes remain visible.
 collapseAll :: EState -> EState
-collapseAll st =  moveAround (collapseAll' True) st & theList %~ listMoveTo 0
+collapseAll st = moveAround (collapseAll' True) st & theList %~ listMoveTo 0
 
-collapseAll' :: Bool ->  (Int, Zipper) -> Maybe (Int, Zipper)
+collapseAll' :: Bool -> (Int, Zipper) -> Maybe (Int, Zipper)
 collapseAll' col (n, z) = return (n, z')
-    where z' =  modifyTree  (fmap (& isCollapsed .~ col)) (root z)
-
+  where
+    z' = modifyTree (fmap (& isCollapsed .~ col)) (root z)
 
 -- | Collapses or expands the selected element.
 toggleCollapse :: EState -> EState
@@ -146,7 +145,6 @@ toggleCollapse = moveAround toggleCollapse'
 
 toggleCollapse' :: (Int, Zipper) -> Maybe (Int, Zipper)
 toggleCollapse' (n, z) = Just (n, modifyLabel (& isCollapsed %~ not) z)
-
 
 -----------------------------------------------------------------
 --     The following functions transforms the tree structure
@@ -162,7 +160,6 @@ sortEntries' (n, z) = return (n, z')
   where on t = rootLabel t ^. itsText
         z'   = modifyTree (Tree.applyToForest $ sortOn on) z
         -- z'   = fromTree $ applyToForest (sortOn on) (tree z)
-
 
 dragSideways :: Direction -> EState -> EState
 dragSideways d = moveAround (dragSideways' d)
@@ -193,7 +190,6 @@ dragBelow' (n, z) = do
 dragAbove :: EState -> EState
 dragAbove = moveAround dragAbove'
 
-
 dragAbove' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragAbove' (n, z) = do
     let t  =  tree z
@@ -206,7 +202,6 @@ dragAbove' (n, z) = do
 dragUpperLevel :: EState -> EState
 dragUpperLevel = moveAround dragUpperLevel'
 
-
 dragUpperLevel' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragUpperLevel' (n, z) = do
     guard =<< not . isRoot <$> parent z
@@ -218,12 +213,10 @@ dragUpperLevel' (n, z) = do
 dragLowerLevel :: EState -> EState
 dragLowerLevel = moveAround dragLowerLevel'
 
-
 dragLowerLevel' :: (Int, Zipper) -> Maybe (Int, Zipper)
 dragLowerLevel' (n, z) = do
-    z' <- parent =<< (Z.insert (tree z) . children <$> nextTree (Z.delete z))
-    return (n+1, modifyLabel (& isCollapsed .~ False) z')
-
+  z' <- parent =<< (Z.insert (tree z) . children <$> nextTree (Z.delete z))
+  return (n + 1, modifyLabel (& isCollapsed .~ False) z')
 
 -----------------------------------------------------------------
 -- The following functions add or remove nodes from the tree.

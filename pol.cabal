@@ -56,6 +56,7 @@ library
     , microlens-platform
     , rosezipper
     , string-conversions
+    , tce-conf
     , text
     , text-zipper
     , transformers
@@ -69,6 +70,7 @@ executable pol
   other-modules:
       Adapter.Config
       Types.CliArguments
+      Types.LocalConfig
       Paths_pol
   hs-source-dirs:
       app
@@ -85,6 +87,7 @@ executable pol
     , pol
     , rosezipper
     , string-conversions
+    , tce-conf
     , text
     , text-zipper
     , transformers
@@ -112,6 +115,7 @@ test-suite pol-test
     , pol
     , rosezipper
     , string-conversions
+    , tce-conf
     , text
     , text-zipper
     , transformers

@@ -41,4 +41,4 @@ cliInstructions homeDir = CliArgs
 
 -- | Show options, no gui
 greet :: Config -> IO ()
-greet (Config filename) = putStrLn $ "Filename input: " <> show filename
+greet conf = putStrLn $ "Filename input: " <> show (saveFile conf)
