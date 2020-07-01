@@ -9,28 +9,32 @@ import Types.Base
 import Prelude hiding(FilePath)
 import Types.CliArguments  (CliArgs(..))
 import Types.AppConfig (Config(..))
+import qualified Turtle as Sh
 
 import Adapter.Config as Config
 import StartApp(runTheApp)
 
 
 main :: IO ()
-main = operationMode =<< Config.build <$> OA.execParser cliParser
+main = do
+    homeDir <- Sh.home
+    config <- Config.build <$> OA.execParser (cliParser homeDir)
+    operationMode config
 
-cliParser :: OA.ParserInfo CliArgs
-cliParser = OA.info (cliInstructions <**> OA.helper)
+cliParser :: FilePath -> OA.ParserInfo CliArgs
+cliParser homeDir = OA.info (cliInstructions homeDir <**> OA.helper)
                    ( OA.fullDesc
                    <> OA.progDesc "Console GUI tree based note taker"
                    <> OA.header   "you can choose which eert file to load" )
 
-cliInstructions :: OA.Parser CliArgs
-cliInstructions = CliArgs
+cliInstructions :: FilePath -> OA.Parser CliArgs
+cliInstructions homeDir = CliArgs
       <$> OA.many (OA.argument OA.str (OA.metavar "FILE"))
       <*> OA.strOption
              ( OA.long    "filename"
             <> OA.short   'f'
             <> OA.metavar "FILE"
-            <> OA.value   "~/.eert.main.json"
+            <> OA.value   (homeDir </> "eert.tree.json")
             <> OA.help    "Loads tree in FILE" )
 
 operationMode = runTheApp

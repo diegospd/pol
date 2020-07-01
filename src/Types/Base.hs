@@ -5,12 +5,13 @@ module Types.Base
     Tree (..),
     TreePos (..),
     FilePath(..),
+    (</>),
     module X,
   )
 where
 
 import Prelude   hiding (FilePath)
-import Turtle           (FilePath(..))
+import Turtle           (FilePath(..), (</>))
 import Data.Text        (Text (..))
 import Data.Tree        (Tree(..))
 import Data.Tree.Zipper (TreePos (..))
