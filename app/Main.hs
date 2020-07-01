@@ -9,11 +9,11 @@ import qualified Options.Applicative as OA
 import StartApp (runTheApp)
 import qualified Turtle as Sh
 import Types.AppConfig (Config (..))
+import qualified Types.AppConfig as Config
 import Types.Base
 import Types.CliArguments (CliArgs (..))
 import Prelude hiding (FilePath)
 
-operationMode = runTheApp
 
 main :: IO ()
 main = do
@@ -51,4 +51,12 @@ cliInstructions homeDir =
 
 -- | Show options, no gui
 greet :: Config -> IO ()
-greet conf = putStrLn $ "Filename input: " <> show (saveFile conf)
+greet conf = do
+   putStrLn $ "Filename input: " <> show (saveFile conf)
+   putStrLn $ "verbosity: " <> show (Config.verbose conf)
+
+
+operationMode :: Config -> IO ()
+operationMode conf = do
+  greet conf
+  runTheApp conf

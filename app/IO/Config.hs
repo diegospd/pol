@@ -20,7 +20,7 @@ parseLocalConfig homeDir rawString =
   let conf = KVConf.parseToMap rawString
    in Config
         { saveFile = fromMaybe (localConfig homeDir) (withSaveFile conf)
-        , debug = False
+        , verbose = False
         }
 
 loadLocalConfig :: FilePath -> IO Config

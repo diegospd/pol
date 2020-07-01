@@ -7,4 +7,4 @@ import Prelude hiding (FilePath)
 
 data Config
   = Config { saveFile :: FilePath
-           , debug    :: Bool}
+           , verbose  :: Bool}
