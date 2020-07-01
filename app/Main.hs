@@ -17,10 +17,10 @@ import Prelude hiding (FilePath)
 
 main :: IO ()
 main = do
-  homeDir <- Sh.home
-  let localConfigFile = homeDir </> ".eert.conf"
-  localConfig <- loadLocalConfig localConfigFile
-  config <- Config.build <$> OA.execParser (cliParser homeDir)
+  homeDir                 <- Sh.home
+  let localConfigFilepath  = homeDir </> ".eert.conf"
+  maybeLocalConfig        <- loadLocalConfig localConfigFilepath
+  config                  <- Config.build <$> OA.execParser (cliParser homeDir)
   operationMode config
 
 cliParser :: FilePath -> OA.ParserInfo CliArgs
