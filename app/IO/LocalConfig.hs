@@ -11,7 +11,7 @@ import Types.LocalConfig as Local
 import qualified Turtle as Sh
 import qualified Data.Text as T
 import Data.Maybe
-import Adapter.Config (localConfig)
+
 
 withSaveFile :: KVConf.KVConf ->  Maybe FilePath
 withSaveFile conf = Nothing

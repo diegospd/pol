@@ -10,6 +10,3 @@ import Prelude hiding(FilePath)
 build :: CliArgs -> Config
 build (CliArgs (file:_) _fallback verbose) = Config file     verbose
 build (CliArgs []        fallback verbose) = Config fallback verbose
-
-localConfig :: FilePath -> FilePath
-localConfig homeDir = homeDir </> ".eert.conf"
