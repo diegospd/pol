@@ -10,7 +10,6 @@ where
 
 import Prelude hiding (FilePath)
 import Types.Base
-import GHC.Generics
 import qualified Types.Brick as B
 import Types.ETree
 

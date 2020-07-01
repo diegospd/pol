@@ -37,7 +37,6 @@ library
       Logic.Tree
       Logic.Zipper
       StartApp
-      Types.App
       Types.AppConfig
       Types.Base
       Types.Brick

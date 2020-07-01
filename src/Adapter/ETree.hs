@@ -5,7 +5,6 @@ module Adapter.ETree where
 import Prelude hiding (FilePath)
 import Types.Base
 import Types.ETree as ETree
-import Types.EState
 
 import qualified Types.Brick  as B
 import qualified Data.Vector  as V

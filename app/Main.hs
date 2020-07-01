@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Options.Applicative as OA
-import Options.Applicative ((<**>))
+import qualified Options.Applicative as OA
 import Data.Monoid         ((<>))
 
 import Types.Base

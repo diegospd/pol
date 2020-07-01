@@ -19,7 +19,7 @@ checkOrCreate saveFile = do
 
 writeTree :: FilePath -> Tree Entry -> IO ()
 writeTree saveFile t = do
-    exists <- checkOrCreate saveFile
+    _exists <- checkOrCreate saveFile
     Sh.writeTextFile saveFile (cs $ Json.encode t)
 
 readTree :: FilePath -> IO (Maybe (Tree Entry))
