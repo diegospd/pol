@@ -8,8 +8,9 @@ import IO.LocalConfig (loadLocalConfig)
 import qualified Options.Applicative as OA
 import StartApp (runTheApp)
 import qualified Turtle as Sh
-import Types.AppConfig (Config (..))
+import Types.AppConfig
 import qualified Types.AppConfig as Config
+import qualified Logic.Config as Config
 import Types.Base
 import Types.CliArguments (CliArgs (..))
 import Prelude hiding (FilePath)
@@ -18,9 +19,10 @@ import Prelude hiding (FilePath)
 main :: IO ()
 main = do
   homeDir                 <- Sh.home
-  let localConfigFilepath  = homeDir </> ".eert.conf"
+  let localConfigFilepath =  homeDir </> ".eert.conf"
   maybeLocalConfig        <- loadLocalConfig localConfigFilepath
-  config                  <- Config.build <$> OA.execParser (cliParser homeDir)
+  cliArgs                 <- OA.execParser (cliParser homeDir)
+  let config              =  Config.build maybeLocalConfig cliArgs
   operationMode config
 
 cliParser :: FilePath -> OA.ParserInfo CliArgs

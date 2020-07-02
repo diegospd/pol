@@ -68,6 +68,7 @@ library
 executable pol
   main-is: Main.hs
   other-modules:
+      Adapter.CliArgs
       Adapter.Config
       IO.LocalConfig
       Logic.Config

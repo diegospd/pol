@@ -6,5 +6,5 @@ import Types.CliArguments
 import Types.LocalConfig
 import Types.AppConfig
 
-merge :: CliArgs -> LocalConfig -> Config
-merge = undefined
+build :: Maybe LocalConfig -> CliArgs -> Config
+build = undefined
