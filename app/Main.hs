@@ -54,4 +54,4 @@ greet conf = do
 operationMode :: Config -> IO ()
 operationMode conf = do
   greet conf
---  runTheApp conf
+  runTheApp conf
