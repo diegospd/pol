@@ -5,6 +5,7 @@ import Types.Base
 import Types.CliArguments
 import Types.LocalConfig
 import Types.AppConfig
+import Adapter.Config as Config
 
 build :: Maybe LocalConfig -> CliArgs -> Config
-build = undefined
+build Nothing cliArgs = Config.fromCliArgs cliArgs
