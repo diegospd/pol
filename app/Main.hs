@@ -22,7 +22,7 @@ main = do
   let localConfigFilepath =  homeDir </> ".eert.conf"
   maybeLocalConfig        <- loadLocalConfig localConfigFilepath
   cliArgs                 <- OA.execParser (cliParser homeDir)
-  let config              =  Config.build maybeLocalConfig cliArgs
+  let config              =  Config.build localConfigFilepath maybeLocalConfig cliArgs
   operationMode config
 
 cliParser :: FilePath -> OA.ParserInfo CliArgs
@@ -39,13 +39,6 @@ cliInstructions homeDir =
   CliArgs
     <$> OA.many (OA.argument OA.str
                              (OA.metavar "FILE"))
-    <*> OA.strOption
-      ( OA.long         "filename"
-          <> OA.short   'f'
-          <> OA.metavar "FILE"
-          <> OA.value   (homeDir </> ".eert.tree.json")
-          <> OA.help    "Loads tree in FILE"
-      )
     <*> OA.switch
       ( OA.long "verbose"
        <> OA.short 'v'

@@ -7,7 +7,6 @@ import Types.LocalConfig
 import Types.AppConfig
 import Adapter.Config as Config
 
-build :: Maybe LocalConfig -> CliArgs -> Config
-build Nothing cliArgs = Config.fromCliArgs cliArgs
-build (Just local) cliArgs = Config undefined undefined
-    where cliConfig = Config.fromCliArgs cliArgs
+build :: FilePath -> Maybe LocalConfig -> CliArgs -> Config
+build defaultSaveFile Nothing (CliArgs [] verbose) = Config defaultSaveFile verbose
+--build defaultSaveFile _ (CliArgs [] verbose) = Config defaultSaveFile verbose
