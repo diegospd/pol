@@ -9,3 +9,5 @@ import Adapter.Config as Config
 
 build :: Maybe LocalConfig -> CliArgs -> Config
 build Nothing cliArgs = Config.fromCliArgs cliArgs
+build (Just local) cliArgs = Config undefined undefined
+    where cliConfig = Config.fromCliArgs cliArgs
