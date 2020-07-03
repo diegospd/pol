@@ -14,13 +14,17 @@ import Types.Base
 import Types.CliArguments (CliArgs (..))
 import Prelude hiding (FilePath)
 
+-- | (LocalConfig, default saveFile)
+defaultFileLocations :: IO (FilePath, FilePath)
+defaultFileLocations = do
+  homeDirectory <- Sh.home
+  return ( homeDirectory </> ".pol.conf", homeDirectory </> ".pol.tree.json")
 
 main :: IO ()
 main = do
-  homeDir                 <- Sh.home
-  let localConfigFilepath =  homeDir </> ".pol.conf"
+  (localConfigFilepath, defaultSaveFile) <- defaultFileLocations
   maybeLocalConfig        <- loadLocalConfig localConfigFilepath
-  cliArgs                 <- OA.execParser (cliParser homeDir)
+  cliArgs                 <- OA.execParser (cliParser undefined)
   let config              =  Config.build localConfigFilepath maybeLocalConfig cliArgs
   operationMode config
 
