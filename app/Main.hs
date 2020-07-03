@@ -2,7 +2,6 @@
 
 module Main where
 
-import Adapter.Config as Config
 import Data.Monoid ((<>))
 import IO.LocalConfig (loadLocalConfig)
 import qualified Options.Applicative as OA
@@ -19,7 +18,7 @@ import Prelude hiding (FilePath)
 main :: IO ()
 main = do
   homeDir                 <- Sh.home
-  let localConfigFilepath =  homeDir </> ".eert.conf"
+  let localConfigFilepath =  homeDir </> ".pol.conf"
   maybeLocalConfig        <- loadLocalConfig localConfigFilepath
   cliArgs                 <- OA.execParser (cliParser homeDir)
   let config              =  Config.build localConfigFilepath maybeLocalConfig cliArgs
@@ -29,9 +28,9 @@ cliParser :: FilePath -> OA.ParserInfo CliArgs
 cliParser homeDir =
   OA.info
     (cliInstructions homeDir OA.<**> OA.helper)
-    ( OA.fullDesc
-        <> OA.progDesc "Console GUI tree-based note taker"
-        <> OA.header "you can choose which tree file to load"
+    (  OA.fullDesc
+    <> OA.header   "POL - Console GUI tree-based note taker"
+    <> OA.progDesc "Launches the Pol GUI loading FILE or default "
     )
 
 cliInstructions :: FilePath -> OA.Parser CliArgs
