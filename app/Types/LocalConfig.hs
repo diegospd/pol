@@ -8,4 +8,4 @@ import Prelude hiding(FilePath)
 data LocalConfig = LocalConfig
   { saveFile :: Maybe FilePath
   , verbose  :: Maybe Bool
-  }
+  } deriving(Show)

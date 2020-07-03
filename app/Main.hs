@@ -47,8 +47,7 @@ cliInstructions homeDir =
 -- | Show options, no gui
 greet :: Config -> IO ()
 greet conf = do
-   putStrLn $ "Filename input: " <> show (saveFile conf)
-   putStrLn $ "verbosity: " <> show (Config.verbose conf)
+   print conf
 
 
 operationMode :: Config -> IO ()
