@@ -20,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('stack.yaml') }}
           restore-keys: |
             ${{ runner.os }}-
-      - name: Pedantic build
+      - name: Stack build
         run: stack --system-ghc build
 
   pedantic:
