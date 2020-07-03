@@ -18,14 +18,16 @@ import Prelude hiding (FilePath)
 defaultFileLocations :: IO (FilePath, FilePath)
 defaultFileLocations = do
   homeDirectory <- Sh.home
-  return ( homeDirectory </> ".pol.conf", homeDirectory </> ".pol.tree.json")
+  return ( homeDirectory </> ".pol.conf"
+         , homeDirectory </> ".pol.tree.json")
 
 main :: IO ()
 main = do
-  (localConfigFilepath, defaultSaveFile) <- defaultFileLocations
-  maybeLocalConfig        <- loadLocalConfig localConfigFilepath
-  cliArgs                 <- OA.execParser (cliParser undefined)
-  let config              =  Config.build localConfigFilepath maybeLocalConfig cliArgs
+  (pathLocalConfig
+   ,pathDefaultSaveFile) <- defaultFileLocations
+  maybeLocalConfig       <- loadLocalConfig pathLocalConfig
+  cliArgs                <- OA.execParser (cliParser undefined)
+  let config             =  Config.build pathDefaultSaveFile maybeLocalConfig cliArgs
   operationMode config
 
 cliParser :: FilePath -> OA.ParserInfo CliArgs
