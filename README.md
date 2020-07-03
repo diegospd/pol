@@ -22,7 +22,7 @@ Features:
 * The complete list of controls can be displayed by pressing `h`.
 
 
-## Build and run
+## Build
 
 Use stack to build the project:
 ```sh
@@ -41,4 +41,8 @@ stack install
 pol
 ```
 
-More info on stack at http://docs.haskellstack.org/en/stable/README/.
+More info on stack at http://docs.haskellstack.org/en/stable/README/
+
+## Running pol
+
+
